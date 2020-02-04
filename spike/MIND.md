@@ -17,11 +17,17 @@
 
 ## Operations ##
 global-namespace: free
+
 box: maxsize, size, begin, end, at, empty, clear, clone, merge, dump, shrink
+
 seq: [m]push, pop, front, back, sort, reverse, pour
+
 map: add, rmkey, rm, count, find
+
 tuple: i8/u8 .. i64/u64, float, double, cstr, box, tuple(fmt, ...), length, get
+
 pair: 
+
 iter: prev, next, ptr, erase, take
 
 ## Note ##
@@ -30,8 +36,7 @@ seq和map不是具体的结构体，只是对box的分类标记，在一些借�
 
 
 ## Simple ##
-
-* vector
+vector:
 ```c
 ax_box_t v = ax_vector_alloc("d");
 ax_seq_assign(ax_tuple_alloc("d*", ax_2, 1, 2)); // 使用tuple构造vector
@@ -49,8 +54,7 @@ ax_free(it);
 ax_free(v);
 ```
 
-* avltree
-
+avltree:
 ```c
 ax_box_t m = ax_avltree_alloc("ds");
 ax_map_assign(ax_tuple_alloc("P[ds]*", ax_2, 1, "Beijing", 2, "Shanghai"));
