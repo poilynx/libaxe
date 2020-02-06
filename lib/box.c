@@ -1,8 +1,7 @@
-#include <stdio.h>
-#include <stdarg.h>
-#include "base.h"
 #include "box.h"
 #include "ref.h"
+#include <stdio.h>
+#include <stdarg.h>
 
 
 size_t ax_box_maxsize(ax_box_t* box)
@@ -36,8 +35,8 @@ ax_ref_t ax_box_at(ax_box_t* box, ...)
 	va_list va;
 	va_start(va, box);
 	va_end(va);
-	ax_clip_t clip;
-	ax_ref_vcopy(box->idx_type, &clip, va);
+	ax_basic_t basic;
+	ax_basic_vcopy(box->idx_type, &basic, va);
 	return box->boxcb.locate(box, &clip);
 }
 

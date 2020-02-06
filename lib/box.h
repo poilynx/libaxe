@@ -1,9 +1,9 @@
 #ifndef BOX_H_
 #define BOX_H_
 #include "base.h"
-#include "tuple"
 #include "iter.h"
 #include "ref.h"
+
 
 /* For Finding elements and their attributes */
 typedef void node_t;
@@ -22,10 +22,6 @@ typedef node_t* (*ax_box_locate_cb)(ax_box_t* box, void *index);
 typedef node_t* (*ax_box_remove_cb)(ax_box_t* box, node_t*);
 typedef elem_t* (*ax_box_value_cb) (ax_box_t* box, node_t* n);
 typedef char*   (*ax_box_dump_cb)  (ax_box_t* box, size_t indent);
-
-typedef void    (*ax_seq_push_cb)  (ax_box_t* box, elem_t* elem);
-typedef void    (*ax_seq_pop_cb)   (ax_box_t* box);
-typedef void    (*ax_seq_sort)     (ax_box_t* box);
 
 typedef void    (*ax_elem_clean_cb)(const elem_t* e);
 typedef uint32_t(*ax_elem_hash_cb) (const elem_t* e);
@@ -59,20 +55,6 @@ struct ax_elem_cbset_st
 };
 typedef struct ax_elem_cbset_st ax_elem_cbset_t;
 
-struct ax_seq_cbset_st
-{
-	ax_seq_push_cb push;
-	ax_seq_pop_cb  pop;
-	ax_seq_sort_cb sort;
-};
-typedef struct ax_seq_cbset_st ax_seq_cbset_t;
-
-struct ax_seq_st
-{
-	ax_seq_cbset_t cbset;
-};
-typedef struct ax_seq_st ax_seq_t;
-
 struct ax_box_st
 {
 	char box_type;
@@ -85,7 +67,7 @@ struct ax_box_st
 	}
 	char header[0];
 };
-typedef struct ax_box_st* ax_box_t;
+typedef struct ax_box_st ax_box_t;
 
 size_t    ax_box_maxsize(ax_box_t* box);
 size_t    ax_box_size(ax_box_t* box);
@@ -97,11 +79,5 @@ void      ax_box_clear(ax_box_t* box);
 ax_box_t* ax_box_clone(ax_box_t* box);
 int       ax_box_merge(ax_box_t* dst, ax_box_t* src);
 void      ax_box_dump(ax_box_t* box);
-
-void      ax_seq_push(ax_box_t* box, ...);
-void      ax_seq_pop(ax_box_t* box);
-ax_ref_t  ax_seq_front(ax_box_t* box);
-ax_ref_t  ax_seq_back(ax_box_t* box);
-void      ax_seq_pour(ax_box_t* box, void* buf);
 
 #endif
