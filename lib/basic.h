@@ -13,12 +13,13 @@ typedef uint8_t ax_basic_type_t;
 #define AX_BT_U16   5
 #define AX_BT_U32   6
 #define AX_BT_U64   7
-#define AX_BT_F     8
-#define AX_BT_LF    9
-#define AX_BT_LLF   10
-#define AX_BT_STR   11
-#define AX_BT_PTR   12
-#define AX_BT_RAW   13
+#define AX_BT_Z     8
+#define AX_BT_F     9
+#define AX_BT_LF    10
+#define AX_BT_LLF   11
+#define AX_BT_STR   12
+#define AX_BT_PTR   13
+#define AX_BT_RAW   14
 
 
 union ax_basic_u
@@ -31,11 +32,13 @@ union ax_basic_u
 	uint16_t u16;
 	uint32_t u32;
 	uint64_t u64;
+	size_t   z;
 	float    f;
 	double   lf;
 	long double llf;
 	char*    str;
 	void*    ptr;
+	void*    raw;
 };
 typedef union ax_basic_u ax_basic_t;
 

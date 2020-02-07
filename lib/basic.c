@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdarg.h>
+#include <string.h>
 char* ax_basic_name(ax_basic_type_t type)
 {
 	switch(type) {
@@ -13,6 +14,7 @@ char* ax_basic_name(ax_basic_type_t type)
 		case AX_BT_U16:  return "uint16_t";
 		case AX_BT_U32:  return "uint32_t";
 		case AX_BT_U64:  return "uint64_t";
+		case AX_BT_Z:    return "size_t";
 		case AX_BT_F:    return "float";
 		case AX_BT_LF:   return "double";
 		case AX_BT_LLF:  return "long_double";
@@ -34,35 +36,60 @@ size_t ax_basic_size(ax_basic_type_t type)
 		case AX_BT_U16:  return sizeof(uint16_t);
 		case AX_BT_U32:  return sizeof(uint32_t);
 		case AX_BT_U64:  return sizeof(uint64_t);
+		case AX_BT_Z:    return sizeof(size_t);
 		case AX_BT_F:    return sizeof(float);
 		case AX_BT_LF:   return sizeof(double);
 		case AX_BT_LLF:  return sizeof(long double);
 		case AX_BT_STR:
-		case AX_BT_PTR:
-		default:         return 0;
+		case AX_BT_PTR:  return sizeof(void*);
+		case AX_BT_RAW:  return sizeof(void*);
 	}
+	ax_fault("Unrecognized type %d", type);
+	return 0;
 }
 
 
-void ax_basic_va_read(ax_basic_type_t type, ax_basic_t* basic, va_list arg)
+size_t ax_basic_va_read(ax_basic_type_t type, ax_basic_t* basic, va_list arg)
 {
-	ax_assert(type<AX_BT_RAW, "Unsupport type '%s'(%d)", ax_basic_name(type), type);
+	ax_assert(type<=AX_BT_RAW, "Unsupport type '%s'(%d)", ax_basic_name(type), type);
 	va_list va;
 	va_copy(va, arg);
+	size_t size = 0;
 	switch(type) {
-		case AX_BT_I8:  basic->i8 =  (int8_t)va_arg(va, int32_t); break;
+		case AX_BT_I8:  basic->i8  = (int8_t)va_arg(va, int32_t); break;
 		case AX_BT_I16: basic->i16 = (int16_t)va_arg(va, int32_t); break;
 		case AX_BT_I32: basic->i32 = va_arg(va, int32_t); break;
 		case AX_BT_I64: basic->u64 = va_arg(va, int64_t); break;
-		case AX_BT_U8:  basic->u8 =  (uint8_t)va_arg(va, uint32_t); break;
+		case AX_BT_U8:  basic->u8  = (uint8_t)va_arg(va, uint32_t); break;
 		case AX_BT_U16: basic->u16 = (uint16_t)va_arg(va, uint32_t); break;
 		case AX_BT_U32: basic->u32 = va_arg(va, uint32_t); break;
 		case AX_BT_U64: basic->u64 = va_arg(va, uint64_t); break;
-		case AX_BT_F:   basic->f =   (float)va_arg(va, double); break;
-		case AX_BT_LF:  basic->lf =  va_arg(va, double); break;
+		case AX_BT_Z:   basic->z   = (float)va_arg(va, size_t); break;
+		case AX_BT_F:   basic->f   = (float)va_arg(va, double); break;
+		case AX_BT_LF:  basic->lf  = va_arg(va, double); break;
 		case AX_BT_LLF: basic->llf = va_arg(va, long double); break;
-		case AX_BT_STR: basic->str = va_arg(va, void*); break;
 		case AX_BT_PTR: basic->ptr = va_arg(va, void*); break;
+		case AX_BT_STR: 
+		{
+			char* str = va_arg(va, void*);
+			size = strlen(str) + sizeof('\0');
+			char* buf = malloc(size);
+			memcpy(buf, str, size);
+			basic->str = buf;
+			break;
+		}
+		case AX_BT_RAW:
+		{
+			void* p = va_arg(va, void*);
+			size = va_arg(va, size_t);
+			void* buf = malloc(size);
+		memcpy(buf, p, size);
+			basic->raw = buf;
+			break;
+			break;
+		}
+		break;
 	}
 	va_end(va);
+	return size;
 }
