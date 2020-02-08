@@ -14,18 +14,25 @@
 //		break;
 //	}
 //}
+#define AX_TF_MUTABLE 0x01
+struct ax_tuple_item_st
+{
+	ax_basic_type_t type;
+	uint8_t flag;
+	char    label;
+	size_t  count;
+	void* ptr;
+};
+typedef struct ax_tuple_item_st ax_tuple_item_t;
 
 struct ax_tuple_st
 {
-	size_t tuple_size;
-	ax_basic_type_t* item_ptr_tab;
-	size_t* item_size_tab;
+	size_t size;
+	ax_tuple_item_t* item_tab;
 	void* stash;
 };
 typedef struct ax_tuple_st ax_tuple_t;
 
 ax_tuple_t* ax_tuple_alloc(char* layout, ...);
-
-
 
 #endif

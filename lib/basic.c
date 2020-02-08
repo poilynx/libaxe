@@ -42,7 +42,7 @@ size_t ax_basic_size(ax_basic_type_t type)
 		case AX_BT_LLF:  return sizeof(long double);
 		case AX_BT_STR:
 		case AX_BT_PTR:  return sizeof(void*);
-		case AX_BT_RAW:  return sizeof(void*);
+		case AX_BT_RAW:  return sizeof(unsigned char);
 	}
 	ax_fault("Unrecognized type %d", type);
 	return 0;
@@ -83,9 +83,8 @@ size_t ax_basic_va_read(ax_basic_type_t type, ax_basic_t* basic, va_list arg)
 			void* p = va_arg(va, void*);
 			size = va_arg(va, size_t);
 			void* buf = malloc(size);
-		memcpy(buf, p, size);
+			memcpy(buf, p, size);
 			basic->raw = buf;
-			break;
 			break;
 		}
 		break;

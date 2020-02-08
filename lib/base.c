@@ -9,7 +9,7 @@ void __ax_fault(const char* file, int line, const char* func, const char* brief,
 	va_list vl;
 	va_start(vl, fmt);
 	vsnprintf(err, sizeof(err), fmt, vl);
-	fprintf(stderr, "%s#%d: %s: %s, in %s\n", func, line, brief, err, file);
+	fprintf(stderr, "%s:%s:%d: %s: %s\n", file, func, line, brief, err);
 	va_end(vl);
 	abort();
 }
