@@ -1,6 +1,6 @@
 #ifndef VAIL_H_
 #define VAIL_H_
-#include "base.h"
+#include "def.h"
 #include "basic.h"
 #include <stdint.h>
 #include <stddef.h>

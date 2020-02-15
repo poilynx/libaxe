@@ -94,6 +94,38 @@ size_t ax_basic_va_read(ax_basic_type_t type, ax_basic_t* basic, va_list arg)
 	return size;
 }
 
+static ax_basic_type_t type_i8 (const void* e) { return AX_BT_I8; }
+static ax_basic_type_t type_i16(const void* e) { return AX_BT_I16; }
+static ax_basic_type_t type_i32(const void* e) { return AX_BT_I32; }
+static ax_basic_type_t type_i64(const void* e) { return AX_BT_I64; }
+static ax_basic_type_t type_u8 (const void* e) { return AX_BT_U8; } 
+static ax_basic_type_t type_u16(const void* e) { return AX_BT_U16; }
+static ax_basic_type_t type_u32(const void* e) { return AX_BT_U32; }
+static ax_basic_type_t type_u64(const void* e) { return AX_BT_U64; }
+static ax_basic_type_t type_f  (const void* e) { return AX_BT_Z; }  
+static ax_basic_type_t type_lf (const void* e) { return AX_BT_F; }  
+static ax_basic_type_t type_llf(const void* e) { return AX_BT_LF; } 
+static ax_basic_type_t type_z  (const void* e) { return AX_BT_LLF; }
+static ax_basic_type_t type_str(const void* e) { return AX_BT_STR; }
+static ax_basic_type_t type_ptr(const void* e) { return AX_BT_PTR; }
+
+static size_t size_i8 (const void* e) { return ax_basic_size(AX_BT_I8); }
+static size_t size_i16(const void* e) { return ax_basic_size(AX_BT_I16); }
+static size_t size_i32(const void* e) { return ax_basic_size(AX_BT_I32); }
+static size_t size_i64(const void* e) { return ax_basic_size(AX_BT_I64); }
+static size_t size_u8 (const void* e) { return ax_basic_size(AX_BT_U8); } 
+static size_t size_u16(const void* e) { return ax_basic_size(AX_BT_U16); }
+static size_t size_u32(const void* e) { return ax_basic_size(AX_BT_U32); }
+static size_t size_u64(const void* e) { return ax_basic_size(AX_BT_U64); }
+static size_t size_f  (const void* e) { return ax_basic_size(AX_BT_Z); }  
+static size_t size_lf (const void* e) { return ax_basic_size(AX_BT_F); }  
+static size_t size_llf(const void* e) { return ax_basic_size(AX_BT_LF); } 
+static size_t size_z  (const void* e) { return ax_basic_size(AX_BT_LLF); }
+static size_t size_str(const void* e) { return ax_basic_size(AX_BT_STR); }
+static size_t size_ptr(const void* e) { return ax_basic_size(AX_BT_PTR); }
+
+
+
 
 static ax_bool_t equal_i8 (const void* e1, const void* e2) { return *(int8_t*) e1 == *(int8_t*) e2; }
 static ax_bool_t equal_i16(const void* e1, const void* e2) { return *(int16_t*)e1 == *(int16_t*)e2; }
@@ -141,21 +173,21 @@ static size_t hash_str(const void* e) { return 0; } //TODO
 static size_t hash_ptr(const void* e) { return (size_t)*(void**)e; }
 
 
-static void clean_none(const void* e) { }
-#define clean_i8  clean_none
-#define clean_i16 clean_none
-#define clean_i32 clean_none
-#define clean_i64 clean_none
-#define clean_u8  clean_none
-#define clean_u16 clean_none
-#define clean_u32 clean_none
-#define clean_u64 clean_none
-#define clean_f   clean_none
-#define clean_lf  clean_none
-#define clean_llf clean_none
-#define clean_z   clean_none
-static void clean_str(const void* e) { free(*(char**)e); }
-static void clean_ptr(const void* e) { free(*(void**)e); }
+static void free_none(const void* e) { }
+#define free_i8  free_none
+#define free_i16 free_none
+#define free_i32 free_none
+#define free_i64 free_none
+#define free_u8  free_none
+#define free_u16 free_none
+#define free_u32 free_none
+#define free_u64 free_none
+#define free_f   free_none
+#define free_lf  free_none
+#define free_llf free_none
+#define free_z   free_none
+static void free_str(const void* e) { free(*(char**)e); }
+static void free_ptr(const void* e) { free(*(void**)e); }
 
 static char* tostr_i8 (const void* e) { return ""; }
 static char* tostr_i16(const void* e) { return ""; }
@@ -190,45 +222,73 @@ static void copy_ptr(void* e1, const void* e2) { *(void**)e1 = *(void**)e2; }
 
 /* -- Define trait structure -- */
 
-static ax_basic_trait_t trait_i8;
-static ax_basic_trait_t trait_i16;
-static ax_basic_trait_t trait_i32;
-static ax_basic_trait_t trait_i64;
-static ax_basic_trait_t trait_u8;
-static ax_basic_trait_t trait_u16;
-static ax_basic_trait_t trait_u32;
-static ax_basic_trait_t trait_u64;
-static ax_basic_trait_t trait_f;
-static ax_basic_trait_t trait_lf;
-static ax_basic_trait_t trait_llf;
-static ax_basic_trait_t trait_z;
-static ax_basic_trait_t trait_str;
-static ax_basic_trait_t trait_ptr;
+#define DECLARE_TRAIT_STRUCT(_t) \
+	static ax_basic_trait_t trait_##_t = { \
+		.type = type_##_t, \
+		.size = size_##_t, \
+		.equal = equal_##_t, \
+		.less = less_##_t, \
+		.hash = hash_##_t, \
+		.free = free_##_t, \
+		.copy = copy_##_t, \
+		.tostr = tostr_##_t \
+	};
 
-#define INIT_TRAIT_STRUCT(_t) \
-(trait_##_t.equal = &equal_##_t, \
-trait_##_t.less = &less_##_t, \
-trait_##_t.hash = &hash_##_t, \
-trait_##_t.clean = &clean_##_t, \
-trait_##_t.copy = &copy_##_t, \
-trait_##_t.tostr = &tostr_##_t)
+DECLARE_TRAIT_STRUCT(i8 )
+DECLARE_TRAIT_STRUCT(i16)
+DECLARE_TRAIT_STRUCT(i32)
+DECLARE_TRAIT_STRUCT(i64)
+DECLARE_TRAIT_STRUCT(u8 )
+DECLARE_TRAIT_STRUCT(u16)
+DECLARE_TRAIT_STRUCT(u32)
+DECLARE_TRAIT_STRUCT(u64)
+DECLARE_TRAIT_STRUCT(f  )
+DECLARE_TRAIT_STRUCT(lf )
+DECLARE_TRAIT_STRUCT(llf)
+DECLARE_TRAIT_STRUCT(z  )
+DECLARE_TRAIT_STRUCT(str)
+DECLARE_TRAIT_STRUCT(ptr)
+	
 
-static void init_trait(void) {
-	INIT_TRAIT_STRUCT(i8 );
-	INIT_TRAIT_STRUCT(i16);
-	INIT_TRAIT_STRUCT(i32);
-	INIT_TRAIT_STRUCT(i64);
-	INIT_TRAIT_STRUCT(u8 );
-	INIT_TRAIT_STRUCT(u16);
-	INIT_TRAIT_STRUCT(u32);
-	INIT_TRAIT_STRUCT(u64);
-	INIT_TRAIT_STRUCT(f  );
-	INIT_TRAIT_STRUCT(lf );
-	INIT_TRAIT_STRUCT(llf);
-	INIT_TRAIT_STRUCT(z  );
-	INIT_TRAIT_STRUCT(str);
-	INIT_TRAIT_STRUCT(ptr);
-}
+//static ax_basic_trait_t trait_i8;
+//static ax_basic_trait_t trait_i16;
+//static ax_basic_trait_t trait_i32;
+//static ax_basic_trait_t trait_i64;
+//static ax_basic_trait_t trait_u8;
+//static ax_basic_trait_t trait_u16;
+//static ax_basic_trait_t trait_u32;
+//static ax_basic_trait_t trait_u64;
+//static ax_basic_trait_t trait_f;
+//static ax_basic_trait_t trait_lf;
+//static ax_basic_trait_t trait_llf;
+//static ax_basic_trait_t trait_z;
+//static ax_basic_trait_t trait_str;
+//static ax_basic_trait_t trait_ptr;
+//
+//#define INIT_TRAIT_STRUCT(_t) \
+//(trait_##_t.equal = &equal_##_t, \
+//trait_##_t.less = &less_##_t, \
+//trait_##_t.hash = &hash_##_t, \
+//trait_##_t.free = &free_##_t, \
+//trait_##_t.copy = &copy_##_t, \
+//trait_##_t.tostr = &tostr_##_t)
+//
+//static void init_trait(void) {
+//	INIT_TRAIT_STRUCT(i8 );
+//	INIT_TRAIT_STRUCT(i16);
+//	INIT_TRAIT_STRUCT(i32);
+//	INIT_TRAIT_STRUCT(i64);
+//	INIT_TRAIT_STRUCT(u8 );
+//	INIT_TRAIT_STRUCT(u16);
+//	INIT_TRAIT_STRUCT(u32);
+//	INIT_TRAIT_STRUCT(u64);
+//	INIT_TRAIT_STRUCT(f  );
+//	INIT_TRAIT_STRUCT(lf );
+//	INIT_TRAIT_STRUCT(llf);
+//	INIT_TRAIT_STRUCT(z  );
+//	INIT_TRAIT_STRUCT(str);
+//	INIT_TRAIT_STRUCT(ptr);
+//}
 
 /* -- Define functions that get trait structure pointer -- */
 const ax_basic_trait_t* ax_basic_get_trait(ax_basic_type_t type)
@@ -253,7 +313,7 @@ const ax_basic_trait_t* ax_basic_get_trait(ax_basic_type_t type)
 	}
 }
 
-void ax_basic_init(void)
-{
-	init_trait();
-}
+//void ax_basic_init(void)
+//{
+//	init_trait();
+//}

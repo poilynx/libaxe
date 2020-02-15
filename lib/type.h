@@ -1,37 +1,68 @@
 #ifndef TYPE_H_
 #define TYPE_H_
+#include "def.h"
 
-#define AX_TN_ANY "any"
-#define AX_TN_BOX "box"
-#define AX_TN_MAP "map"
-#define AX_TN_SEQ "seq"
-typedef void(*ax_free_f)(ax_t* any);
-typedef ax_t*(*ax_clone_f)(ax_t* any);
-typedef void(*ax_dump_f)(ax_t* any);
-typedef char*(*ax_typeof_f)(ax_t* any);
-typedef char*(*ax_name_f)(ax_t* any);
-typedef ax_bool_t(*ax_is_f)(ax_t* any, const char* nm);
+#define AX_T_ANY 0
+#define AX_T_BOX 1
+#define AX_T_MAP 2
+#define AX_T_SEQ 3
 
-struct ax_trait_st
+struct ax_any_st;
+typedef struct ax_any_st ax_any_t;
+struct ax_basic_trait_st;
+typedef struct ax_basic_trait_st ax_basic_trait_t;
+
+typedef void (*ax_free_f)  (ax_any_t* any);
+typedef void (*ax_dump_f)  (const ax_any_t* any, int ind);
+typedef char (*ax_type_f)  (const ax_any_t* any);
+typedef ax_any_t*(*ax_copy_f)  (const ax_any_t* any);
+typedef ax_any_t*(*ax_move_f)  (ax_any_t* any);
+typedef char*(*ax_name_f)  (const ax_any_t* any);
+
+struct ax_any_trait_st
 {
 	ax_free_f   free;
-	ax_clone_f  clone;
 	ax_dump_f   dump;
-	ax_typeof_f typeof;
+	ax_type_f   type;
+	ax_copy_f   copy;
+	ax_move_f   move;
 	ax_name_f   name;
-	ax_is_f     is;
-}
-typedef struct ax_trait_st ax_trait_t;
-struct ax_st
-{
-	ax_trait_t* tr;
-	char flags;
-#ifndef NDEBUG
-	char magic[2];
-#endif
-}
-typedef struct ax_st ax_t;
+};
+typedef struct ax_any_trait_st ax_any_trait_t;
 
-void ax__check_type(ax_t* any, const char* nm);
+#define AX_AF_NEED_FREE 0x01
+struct ax_any_st
+{
+	char magic[3];
+	char flags;
+	ax_any_trait_t* tr;
+};
+
+ax_bool_t ax_IS(ax_any_t* any, char type);
+const char* ax_type_name(char type);
+ax_basic_trait_t* ax_any_basic_trait();
+
+#ifndef NDEBUG
+static ax_bool_t ax__is_any(ax_any_t* any) {
+	return any->magic[0] == 'A'
+		&& any->magic[1] == 'X'
+		&& any->magic[2] == '\0';
+}
+#endif
+
+#define AX_TRAIT_FUN_PREFIX(_f, _a, _t) \
+	ax_ptrace(_f), \
+	ax_assert( \
+		ax__is_any(_a) && ax_IS(_a, _t), \
+		"can't convert type '%s' to '%s'", \
+		ax_type_name(_a->tr->type(_a)), \
+		ax_type_name(AX_T_ANY) \
+	)
+
+#define ax_free(_a)  (AX_TRAIT_FUN_PREFIX(ax_free, _a, AX_T_ANY), _a->tr->free(_a))
+#define ax_type(_a)  (AX_TRAIT_FUN_PREFIX(ax_type, _a, AX_T_ANY), _a->tr->type(_a))
+#define ax_move(_a)  (AX_TRAIT_FUN_PREFIX(ax_move, _a, AX_T_ANY), _a->tr->move(_a))
+#define ax_copy(_a)  (AX_TRAIT_FUN_PREFIX(ax_copy, _a, AX_T_ANY), _a->tr->copy(_a))
+#define ax_name(_a)  (AX_TRAIT_FUN_PREFIX(ax_name, _a, AX_T_ANY), _a->tr->name(_a))
 
 #endif

@@ -1,8 +1,8 @@
 #ifndef REF_H_
 #define REF_H_
-#include <stdarg.h>
-#include "base.h"
+#include "def.h"
 #include "basic.h"
+#include <stdarg.h>
 struct ax_ref_st
 {
 	void *ptr;
