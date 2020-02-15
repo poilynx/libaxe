@@ -1,30 +1,26 @@
 #ifndef SEQ_H_
 #define SEQ_H_
+#include "box.h"
+#include "debug.h"
+struct ax_seq_st;
+typedef struct ax_seq_st ax_seq_t;
 
-struct ax_box_st;
-typedef struct ax_box_st ax_box_t;
+typedef void (*ax_seq_push_f)(ax_seq_t* box, void* e);
+typedef void (*ax_seq_pop_f)(ax_seq_t* box);
+typedef void (*ax_seq_sort_f)(ax_box_t* box);
 
-typedef void    (*ax_seq_push_cb)  (ax_box_t* box, elem_t* elem);
-typedef void    (*ax_seq_pop_cb)   (ax_box_t* box);
-typedef void    (*ax_seq_sort)     (ax_box_t* box);
-
-struct ax_seq_cbset_st
+struct ax_seq_trait_st
 {
-	ax_seq_push_cb push;
-	ax_seq_pop_cb  pop;
-	ax_seq_sort_cb sort;
+	ax_seq_push_f push;
+	ax_seq_pop_f  pop;
+	ax_seq_sort_f sort;
 };
-typedef struct ax_seq_cbset_st ax_seq_cbset_t;
+typedef struct ax_seq_trait_st ax_seq_trait_t;
 
 struct ax_seq_st
 {
-	ax_seq_cbset_t* cbset;
+	ax_box_t box;
+	ax_seq_trait_t* tr;
 };
-typedef struct ax_seq_st ax_seq_t;
 
-void ax_seq_push(ax_box_t* box, ...);
-void ax_seq_pop(ax_box_t* box);
-ax_ref_t ax_seq_front(ax_box_t* box);
-ax_ref_t ax_seq_back(ax_box_t* box);
-void ax_seq_pour(ax_box_t* box, void* buf);
 #endif

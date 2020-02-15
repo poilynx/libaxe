@@ -1,6 +1,8 @@
 #ifndef VECTOR_H_
 #define VECTOR_H_
 #include "base.h"
+#include "seq.h"
+
 struct vector_st
 {
 	void* buffer;

@@ -1,5 +1,6 @@
 #include "vail.h"
 #include "basic.h"
+#include "debug.h"
 #include <stdlib.h>
 #include <ctype.h>
 #include <assert.h>
@@ -228,7 +229,7 @@ ax_vail_t* ax_vail_read(ax_vaf_t* vaf, ...)
 }
 
 void ax_vail_free(ax_vail_t* vail) {
-	ax_vail_t* p = ax_vail_pop(vail);
+	ax_vail_node_t* p = ax_vail_pop(vail);
 	while (p) {
 		free(p);
 		p = ax_vail_pop(vail);

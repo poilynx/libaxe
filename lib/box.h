@@ -4,80 +4,37 @@
 #include "iter.h"
 #include "ref.h"
 
-
-/* For Finding elements and their attributes */
-typedef void node_t;
-/* Element raw data */
-typedef void elem_t;
-
 #define AX_BT_SEQ 0
 #define AX_BT_MAP 1
+struct ax_box_st;
+typedef struct ax_box_st ax_box_t;
 
-typedef size_t  (*ax_box_size_cb)  (ax_box_t* box);
-typedef node_t* (*ax_box_end_cb)   (ax_box_t* box);
-/* overflow if true returned */
-typedef ax_bool_t(*ax_box_shift_cb)(ax_box_t* box, node_t** n, uint64 l);
-typedef uint64_t(*ax_box_distance_cb)(ax_box_t* box, node_t* n);
-typedef node_t* (*ax_box_locate_cb)(ax_box_t* box, void *index);
-typedef node_t* (*ax_box_remove_cb)(ax_box_t* box, node_t*);
-typedef elem_t* (*ax_box_value_cb) (ax_box_t* box, node_t* n);
-typedef char*   (*ax_box_dump_cb)  (ax_box_t* box, size_t indent);
+typedef size_t   (*ax_box_size_f)(ax_box_t* box);
+typedef ax_iter_t(*ax_box_iter_f)(ax_box_t* box);
+typedef ax_iter_t(*ax_box_at_f)  (ax_box_t* box, void *index);
+typedef char*    (*ax_box_dump_f)(ax_box_t* box, int indent);
 
-typedef void    (*ax_elem_clean_cb)(const elem_t* e);
-typedef uint32_t(*ax_elem_hash_cb) (const elem_t* e);
-typedef ax_bool (*ax_elem_equal_cb)(const elem_t* e1, const elem_t* e2);
-typedef ax_bool (*ax_elem_less_cb) (const elem_t* e1, const elem_t* e2);
-typedef char*   (*ax_elem_tostr_cb)(const elem_t* e);
-typedef void    (*ax_elem_copy_cb) (elem_t* dst, elem_t* src);
-
-struct ax_box_cbset_st
+struct ax_box_trait_st
 {
-	ax_box_size_cb     size;
-	ax_box_size_cb     maxsize;
-	ax_box_end_cb      begin;
-	ax_box_end_cb      end;
-	ax_box_shift_cb    shift;
-	ax_box_distance_cb distance;
-	ax_box_value_cb    value;
-	ax_box_dump_cb     dump;
-};
-typedef struct ax_box_cbset_st ax_box_cbset_t;
+	ax_box_size_f size;
+	ax_box_size_f maxsize;
 
-/* entity? */
-struct ax_elem_cbset_st
-{
-	ax_elem_clean_cb clean; 
-	ax_elem_hash_cb  hash;
-	ax_elem_equal_cb equal;
-	ax_elem_less_cb  less;
-	ax_elem_tostr_cb tostr;
-	ax_elem_copy_cb  copy;
+	ax_box_iter_f begin;
+	ax_box_iter_f end;
+	ax_box_iter_f rbegin;
+	ax_box_iter_f rend;
+
+	ax_box_dump_f dump;
 };
-typedef struct ax_elem_cbset_st ax_elem_cbset_t;
+typedef struct ax_box_trait_st ax_box_trait_t;
 
 struct ax_box_st
 {
-	char box_type;
-	char elem_type;
-	char idx_type;
-	ax_box_cbset_t* box_cbset;
-	ax_elem_cbset_t* elem_cbset;
-	union {
-		ax_seq_cbset_t *seq_cbset;
-	}
-	char header[0];
+#ifndef NDEBUG
+	char type[4];
+#endif
+	ax_box_trait_t* tr;
+	char sequel[0];
 };
-typedef struct ax_box_st ax_box_t;
-
-size_t    ax_box_maxsize(ax_box_t* box);
-size_t    ax_box_size(ax_box_t* box);
-ax_iter_t ax_box_begin(ax_box_t* box);
-ax_iter_t ax_box_end(ax_box_t* box);
-ax_ref_t  ax_box_at(ax_box_t* box, ...);
-ax_bool_t ax_box_empty(ax_box_t* box);
-void      ax_box_clear(ax_box_t* box);
-ax_box_t* ax_box_clone(ax_box_t* box);
-int       ax_box_merge(ax_box_t* dst, ax_box_t* src);
-void      ax_box_dump(ax_box_t* box);
 
 #endif

@@ -2,23 +2,38 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+static const char* errfmt = "%s: invalid conversion from '%s%s' to '%s%s'";
+#define CHKTYPE(_t, _m) ax_assert( \
+	_t == r.type && _m == r.mut, \
+	errfmt, \
+	ax_basic_name(r.type), r.mut ? " *" : "", \
+	ax_basic_name(_t), r.mut ? " *" : "")
 
-static const char* errfmt = "%s: invalid conversion from '%s' to '%s'";
-#define CHECK(src, dst) ax_assert(dst == src , errfmt, ax_basic_name(src), ax_basic_name(dst));
+int8_t      ax_ref_i8 (ax_ref_t r) { CHKTYPE(AX_BT_I8 , 0); return *(int8_t*)r.ptr;  }
+int16_t     ax_ref_i16(ax_ref_t r) { CHKTYPE(AX_BT_I16, 0); return *(int16_t*)r.ptr; }
+int32_t     ax_ref_i32(ax_ref_t r) { CHKTYPE(AX_BT_I32, 0); return *(int32_t*)r.ptr; }
+int64_t     ax_ref_i64(ax_ref_t r) { CHKTYPE(AX_BT_I64, 0); return *(int64_t*)r.ptr; }
+uint8_t     ax_ref_u8 (ax_ref_t r) { CHKTYPE(AX_BT_U8,  0); return *(uint8_t*)r.ptr; }
+uint16_t    ax_ref_u16(ax_ref_t r) { CHKTYPE(AX_BT_U16, 0); return *(uint16_t*)r.ptr;}
+uint32_t    ax_ref_u32(ax_ref_t r) { CHKTYPE(AX_BT_U32, 0); return *(uint32_t*)r.ptr;}
+uint64_t    ax_ref_u64(ax_ref_t r) { CHKTYPE(AX_BT_U64, 0); return *(uint64_t*)r.ptr;}
+float       ax_ref_f  (ax_ref_t r) { CHKTYPE(AX_BT_F,   0); return *(float*)r.ptr;   }
+double      ax_ref_lf (ax_ref_t r) { CHKTYPE(AX_BT_LF,  0); return *(double*)r.ptr;  }
+long double ax_ref_llf(ax_ref_t r) { CHKTYPE(AX_BT_LLF, 0); return *(long double*)r.ptr;}
+void*       ax_ref_ptr(ax_ref_t r) { CHKTYPE(AX_BT_PTR, 0); return *(void**)r.ptr;   }
+char*       ax_ref_str(ax_ref_t r) { CHKTYPE(AX_BT_STR, 0); return (char*)r.ptr;     }
 
-int8_t      ax_ref_toi8 (ax_ref_t r) { CHECK(r.type, AX_BT_I8);  return *(int8_t*)r.ptr;  }
-int16_t     ax_ref_toi16(ax_ref_t r) { CHECK(r.type, AX_BT_I16); return *(int16_t*)r.ptr; }
-int32_t     ax_ref_toi32(ax_ref_t r) { CHECK(r.type, AX_BT_I32); return *(int32_t*)r.ptr; }
-int64_t     ax_ref_toi64(ax_ref_t r) { CHECK(r.type, AX_BT_I64); return *(int64_t*)r.ptr; }
-uint8_t     ax_ref_tou8 (ax_ref_t r) { CHECK(r.type, AX_BT_U8);  return *(uint8_t*)r.ptr; }
-uint16_t    ax_ref_tou16(ax_ref_t r) { CHECK(r.type, AX_BT_U16); return *(uint16_t*)r.ptr;}
-uint32_t    ax_ref_tou32(ax_ref_t r) { CHECK(r.type, AX_BT_U32); return *(uint32_t*)r.ptr;}
-uint64_t    ax_ref_tou64(ax_ref_t r) { CHECK(r.type, AX_BT_U64); return *(uint64_t*)r.ptr;}
-float       ax_ref_tof  (ax_ref_t r) { CHECK(r.type, AX_BT_F);   return *(float*)r.ptr;   }
-double      ax_ref_tolf (ax_ref_t r) { CHECK(r.type, AX_BT_LF);  return *(double*)r.ptr;  }
-long double ax_ref_tollf(ax_ref_t r) { CHECK(r.type, AX_BT_LLF); return *(long double*)r.ptr;}
-void*       ax_ref_toptr(ax_ref_t r) { CHECK(r.type, AX_BT_PTR); return *(void**)r.ptr;   }
-char*       ax_ref_tostr(ax_ref_t r) { CHECK(r.type, AX_BT_STR); return (char*)r.ptr;     }
-void*       ax_ref_toraw(ax_ref_t r) { CHECK(r.type, AX_BT_RAW); return r.ptr;            }
-
+int8_t*     ax_ref_pi8 (ax_ref_t r) { CHKTYPE(AX_BT_I8 , 1); return (int8_t*)r.ptr;  }
+int16_t*    ax_ref_pi16(ax_ref_t r) { CHKTYPE(AX_BT_I16, 1); return (int16_t*)r.ptr; }
+int32_t*    ax_ref_pi32(ax_ref_t r) { CHKTYPE(AX_BT_I32, 1); return (int32_t*)r.ptr; }
+int64_t*    ax_ref_pi64(ax_ref_t r) { CHKTYPE(AX_BT_I64, 1); return (int64_t*)r.ptr; }
+uint8_t*    ax_ref_pu8 (ax_ref_t r) { CHKTYPE(AX_BT_U8,  1); return (uint8_t*)r.ptr; }
+uint16_t*   ax_ref_pu16(ax_ref_t r) { CHKTYPE(AX_BT_U16, 1); return (uint16_t*)r.ptr;}
+uint32_t*   ax_ref_pu32(ax_ref_t r) { CHKTYPE(AX_BT_U32, 1); return (uint32_t*)r.ptr;}
+uint64_t*   ax_ref_pu64(ax_ref_t r) { CHKTYPE(AX_BT_U64, 1); return (uint64_t*)r.ptr;}
+float*      ax_ref_pf  (ax_ref_t r) { CHKTYPE(AX_BT_F,   1); return (float*)r.ptr;   }
+double*     ax_ref_plf (ax_ref_t r) { CHKTYPE(AX_BT_LF,  1); return (double*)r.ptr;  }
+long double*ax_ref_pllf(ax_ref_t r) { CHKTYPE(AX_BT_LLF, 1); return (long double*)r.ptr;}
+void**      ax_ref_pptr(ax_ref_t r) { CHKTYPE(AX_BT_PTR, 1); return (void**)r.ptr;   }
+void*       ax_ref_raw (ax_ref_t r) { CHKTYPE(AX_BT_RAW, 1); return r.ptr;           }
 

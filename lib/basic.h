@@ -42,10 +42,28 @@ union ax_basic_u
 };
 typedef union ax_basic_u ax_basic_t;
 
+typedef void      (*ax_basic_clean_f)(const void* e);
+typedef size_t    (*ax_basic_hash_f) (const void* e);
+typedef ax_bool_t (*ax_basic_comp_f)(const void* e1, const void* e2);
+typedef char*     (*ax_basic_tostr_f)(const void* e);
+typedef void      (*ax_basic_copy_f) (void* dst, const void* src);
 
-char*    ax_basic_name (ax_basic_type_t type);
-size_t   ax_basic_size (ax_basic_type_t type);
-void     ax_basic_vcopy(ax_basic_type_t type, ax_basic_t* basic, va_list arg);
+struct ax_basic_trait_st
+{
+	ax_basic_comp_f  equal;
+	ax_basic_comp_f  less;
+	ax_basic_hash_f  hash;
+	ax_basic_clean_f clean; 
+	ax_basic_copy_f  copy;
+	ax_basic_tostr_f tostr;
+};
+typedef struct ax_basic_trait_st ax_basic_trait_t;
+
+char*  ax_basic_name (ax_basic_type_t type);
+size_t ax_basic_size (ax_basic_type_t type);
+void   ax_basic_vcopy(ax_basic_type_t type, ax_basic_t* basic, va_list arg);
+const  ax_basic_trait_t* ax_basic_get_trait(ax_basic_type_t type);
+void   ax_basic_init(void);
 
 
 #endif
