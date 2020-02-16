@@ -248,47 +248,6 @@ DECLARE_TRAIT_STRUCT(llf)
 DECLARE_TRAIT_STRUCT(z  )
 DECLARE_TRAIT_STRUCT(str)
 DECLARE_TRAIT_STRUCT(ptr)
-	
-
-//static ax_basic_trait_t trait_i8;
-//static ax_basic_trait_t trait_i16;
-//static ax_basic_trait_t trait_i32;
-//static ax_basic_trait_t trait_i64;
-//static ax_basic_trait_t trait_u8;
-//static ax_basic_trait_t trait_u16;
-//static ax_basic_trait_t trait_u32;
-//static ax_basic_trait_t trait_u64;
-//static ax_basic_trait_t trait_f;
-//static ax_basic_trait_t trait_lf;
-//static ax_basic_trait_t trait_llf;
-//static ax_basic_trait_t trait_z;
-//static ax_basic_trait_t trait_str;
-//static ax_basic_trait_t trait_ptr;
-//
-//#define INIT_TRAIT_STRUCT(_t) \
-//(trait_##_t.equal = &equal_##_t, \
-//trait_##_t.less = &less_##_t, \
-//trait_##_t.hash = &hash_##_t, \
-//trait_##_t.free = &free_##_t, \
-//trait_##_t.copy = &copy_##_t, \
-//trait_##_t.tostr = &tostr_##_t)
-//
-//static void init_trait(void) {
-//	INIT_TRAIT_STRUCT(i8 );
-//	INIT_TRAIT_STRUCT(i16);
-//	INIT_TRAIT_STRUCT(i32);
-//	INIT_TRAIT_STRUCT(i64);
-//	INIT_TRAIT_STRUCT(u8 );
-//	INIT_TRAIT_STRUCT(u16);
-//	INIT_TRAIT_STRUCT(u32);
-//	INIT_TRAIT_STRUCT(u64);
-//	INIT_TRAIT_STRUCT(f  );
-//	INIT_TRAIT_STRUCT(lf );
-//	INIT_TRAIT_STRUCT(llf);
-//	INIT_TRAIT_STRUCT(z  );
-//	INIT_TRAIT_STRUCT(str);
-//	INIT_TRAIT_STRUCT(ptr);
-//}
 
 /* -- Define functions that get trait structure pointer -- */
 const ax_basic_trait_t* ax_basic_get_trait(ax_basic_type_t type)

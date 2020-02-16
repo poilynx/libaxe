@@ -31,18 +31,19 @@ struct ax_any_trait_st
 typedef struct ax_any_trait_st ax_any_trait_t;
 
 #define AX_AF_NEED_FREE 0x01
+#define AX_AF_FREED     0x02
 struct ax_any_st
 {
 	char magic[3];
 	char flags;
-	ax_any_trait_t* tr;
+	const ax_any_trait_t* tr;
 };
 
 ax_bool_t ax_IS(ax_any_t* any, char type);
 const char* ax_type_name(char type);
 ax_basic_trait_t* ax_any_basic_trait();
 
-#ifndef NDEBUG
+#ifndef AX_NO_ASSERT
 static ax_bool_t ax__is_any(ax_any_t* any) {
 	return any->magic[0] == 'A'
 		&& any->magic[1] == 'X'
@@ -51,13 +52,13 @@ static ax_bool_t ax__is_any(ax_any_t* any) {
 #endif
 
 #define AX_TRAIT_FUN_PREFIX(_f, _a, _t) \
-	ax_ptrace(_f), \
+	(ax_ptrace(_f), \
 	ax_assert( \
 		ax__is_any(_a) && ax_IS(_a, _t), \
 		"can't convert type '%s' to '%s'", \
 		ax_type_name(_a->tr->type(_a)), \
 		ax_type_name(AX_T_ANY) \
-	)
+	))
 
 #define ax_free(_a)  (AX_TRAIT_FUN_PREFIX(ax_free, _a, AX_T_ANY), _a->tr->free(_a))
 #define ax_type(_a)  (AX_TRAIT_FUN_PREFIX(ax_type, _a, AX_T_ANY), _a->tr->type(_a))

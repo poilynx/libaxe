@@ -23,12 +23,12 @@ typedef struct ax_seq_trait_st ax_seq_trait_t;
 struct ax_seq_st
 {
 	ax_box_t box;
-	ax_seq_trait_t* tr;
-	ax_basic_trait_t* elem_tr;
+	const ax_seq_trait_t* tr;
+	const ax_basic_trait_t* elem_tr;
 };
 
-#define ax_seq_push(_a, _e) (AX_TRAIT_FUN_PREFIX(ax_seq_push, _a, AX_T_SEQ), ((ax_seq_t*))_a->tr->push(_a, _e))
-#define ax_seq_pop(_a) (AX_TRAIT_FUN_PREFIX(ax_seq_pop, _a, AX_T_SEQ), ((ax_seq_t*)_a)->tr->pop(_a))
-#define ax_seq_sort(_a) (AX_TRAIT_FUN_PREFIX(ax_seq_sort, _a, AX_T_SEQ), ((ax_seq_t*)_a)->tr->sort(_a))
+#define ax_seq_push(_a, _e) (AX_TRAIT_FUN_PREFIX(ax_seq_push, (_a), AX_T_SEQ), ((ax_seq_t*)(_a))->tr->push(_a, (_e)))
+#define ax_seq_pop(_a) (AX_TRAIT_FUN_PREFIX(ax_seq_pop, (_a), AX_T_SEQ), ((ax_seq_t*)(_a))->tr->pop(_a))
+#define ax_seq_sort(_a) (AX_TRAIT_FUN_PREFIX(ax_seq_sort, (_a), AX_T_SEQ), ((ax_seq_t*)(_a))->tr->sort(_a))
 
 #endif

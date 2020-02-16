@@ -6,10 +6,7 @@
 struct ax_ref_st
 {
 	void *ptr;
-#ifndef NDEBUG
 	char type;
-	char mut;
-#endif
 };
 typedef struct ax_ref_st ax_ref_t;
 

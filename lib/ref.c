@@ -1,13 +1,14 @@
 #include "ref.h"
+#include "debug.h"
 #include <stdio.h>
 #include <stdlib.h>
 
 static const char* errfmt = "%s: invalid conversion from '%s%s' to '%s%s'";
-#define CHKTYPE(_t, _m) ax_assert( \
-	_t == r.type && _m == r.mut, \
+#define CHKTYPE(_t, _p) ax_assert( \
+	_t == r.type, \
 	errfmt, \
-	ax_basic_name(r.type), r.mut ? " *" : "", \
-	ax_basic_name(_t), r.mut ? " *" : "")
+	ax_basic_name(r.type), _p ? " *" : "", \
+	ax_basic_name(_t), _p ? " *" : "")
 
 int8_t      ax_ref_i8 (ax_ref_t r) { CHKTYPE(AX_BT_I8 , 0); return *(int8_t*)r.ptr;  }
 int16_t     ax_ref_i16(ax_ref_t r) { CHKTYPE(AX_BT_I16, 0); return *(int16_t*)r.ptr; }

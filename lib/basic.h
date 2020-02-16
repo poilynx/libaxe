@@ -42,8 +42,8 @@ union ax_basic_u
 };
 typedef union ax_basic_u ax_basic_t;
 
-typedef size_t    (*ax_basic_size_f) (const void* e);
-typedef ax_basic_type_t (*ax_basic_type_f) (const void* e);
+typedef size_t    (*ax_basic_size_f) ();
+typedef ax_basic_type_t (*ax_basic_type_f) ();
 typedef void      (*ax_basic_free_f) (const void* e);
 typedef size_t    (*ax_basic_hash_f) (const void* e);
 typedef ax_bool_t (*ax_basic_comp_f) (const void* e1, const void* e2);

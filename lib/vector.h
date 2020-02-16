@@ -14,6 +14,6 @@ struct ax_vector_st
 };
 typedef struct ax_vector_st ax_vector_t;
 
-ax_box_t* ax_vector_create(ax_vector_t* pt, ax_basic_type_t type, ax_basic_trait_t* elem_tr);
+ax_any_t* ax_vector_create(ax_vector_t* pt, const ax_basic_trait_t* elem_tr);
 #endif
 

@@ -71,7 +71,7 @@ static size_t basic_hash(const void* e)
 static char* basic_tostr(const void* e)
 {
 	char*buf = malloc(20);
-	sprintf(buf, "0x%X", *(void**)e);
+	sprintf(buf, "0x%lX", *(long unsigned int*)e);
 	return buf;
 }
 

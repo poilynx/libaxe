@@ -93,7 +93,7 @@ ax_vaf_t* ax_vaf_make(char *fmt)
 				}
 				TYPE_ACCEPT(AX_BT_STR);
 			default:
-				if(isupper(fmt[pos])) {
+				if(isupper((int)fmt[pos])) {
 					label = fmt[pos];
 					TYPE_ACCEPT(AX_BT_PTR);
 				}
@@ -108,7 +108,7 @@ ax_vaf_t* ax_vaf_make(char *fmt)
 				if(fmt[pos]>='1' && fmt[pos]<='9') {
 					repeat = fmt[pos]-'0';
 					pos++;
-					while(isdigit(fmt[pos])) {
+					while(isdigit((int)fmt[pos])) {
 						repeat = repeat * 10 + fmt[pos]-'0';
 						if (repeat>12) goto bad_char;
 						pos++;
@@ -129,7 +129,7 @@ ax_vaf_t* ax_vaf_make(char *fmt)
 		vaf->table[node_count].repeat = repeat;
 		node_count ++;
 		varg_count += (!!mutab) + 1;
-		if(varg_count = 127 && !end) goto too_many_arg;
+		if(varg_count == 127 && !end) goto too_many_arg;
 	}
 	vaf->magic = '+';
 	vaf->argc = node_count;
@@ -141,6 +141,7 @@ too_many_arg:
 bad_char:
 	free(vaf);
 	ax_fault("unexpected #%d character '%c' in format string\"%s\"", pos+1, fmt[pos], fmt);
+	return NULL;
 }
 
 void ax_vail_push(ax_vail_t* vail, ax_vail_node_t* node)
