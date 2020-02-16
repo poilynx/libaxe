@@ -220,6 +220,23 @@ static void copy_z  (void* e1, const void* e2) { *(size_t*) e1 = *(size_t*) e2; 
 static void copy_str(void* e1, const void* e2) { *(char**)e1 = strdup(*(char**)e2); }
 static void copy_ptr(void* e1, const void* e2) { *(void**)e1 = *(void**)e2; }
 
+#define move_i8  copy_i8 
+#define move_i16 copy_i16
+#define move_i32 copy_i32
+#define move_i64 copy_i64
+#define move_u8  copy_u8 
+#define move_u16 copy_u16
+#define move_u32 copy_u32
+#define move_u64 copy_u64
+#define move_f   copy_f  
+#define move_lf  copy_lf 
+#define move_llf copy_llf
+#define move_z   copy_z  
+#define move_ptr copy_ptr
+#define move_str copy_ptr
+
+
+
 /* -- Define trait structure -- */
 
 #define DECLARE_TRAIT_STRUCT(_t) \
@@ -231,6 +248,7 @@ static void copy_ptr(void* e1, const void* e2) { *(void**)e1 = *(void**)e2; }
 		.hash = hash_##_t, \
 		.free = free_##_t, \
 		.copy = copy_##_t, \
+		.move = move_##_t, \
 		.tostr = tostr_##_t \
 	};
 

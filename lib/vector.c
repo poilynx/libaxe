@@ -7,7 +7,7 @@
 static void iter_shift(ax_iter_t* it, int i)
 {
 	ax_vector_t* vec = it->owner;
-	it->point += (i * (vec->seq.elem_tr->size()));
+	it->point += (i * (vec->elem_size));
 }
 
 static ax_ref_t iter_get(const ax_iter_t* it, int i)
@@ -53,7 +53,8 @@ static ax_iter_trait_t iter_trait = {
 
 static void riter_shift(ax_iter_t* it, int i)
 {
-	it->point -= i * ((ax_vector_t*)it->owner)->seq.elem_tr->size();
+	ax_vector_t* vec = it->owner;
+	it->point -= (i * (vec->elem_size));
 }
 
 static ax_bool_t riter_less(const ax_iter_t* it1, const ax_iter_t* it2)
@@ -108,9 +109,8 @@ static ax_any_t* any_copy(const ax_any_t* any)
 	ax_vector_t* vec = (ax_vector_t*)any;
 	ax_vector_t* new = malloc(sizeof(ax_vector_t));
 	memcpy(new, any, sizeof(ax_vector_t));
-	size_t elem_size = vec->seq.elem_tr->size();
-	new->buffer = malloc(elem_size * vec->capacity);
-	memcpy(new->buffer, vec->buffer, elem_size * vec->size);
+	new->buffer = malloc(vec->elem_size * vec->capacity);
+	memcpy(new->buffer, vec->buffer, vec->elem_size * vec->size);
 	return (ax_any_t*)new;
 }
 
@@ -125,8 +125,7 @@ static ax_any_t* any_move(ax_any_t* any)
 		new = malloc(sizeof(ax_vector_t));
 		memcpy(new, old, sizeof(ax_vector_t));
 		new->buffer = old->buffer;
-		size_t elem_size = old->seq.elem_tr->size();
-		memcpy(new->buffer, old->buffer, elem_size * old->size);
+		memcpy(new->buffer, old->buffer, old->elem_size * old->size);
 		
 		old->size = 0;
 		old->buffer = NULL;
@@ -180,7 +179,7 @@ static ax_iter_t box_end(ax_any_t* any)
 	ax_vector_t* vec = (ax_vector_t*)any;
 	ax_iter_t it;
 	it.owner = any;
-	it.point = vec->buffer + (vec->size * vec->seq.elem_tr->size());
+	it.point = vec->buffer + (vec->elem_size * vec->size);
 	it.tr = &iter_trait;
 	return it;
 	
@@ -191,7 +190,7 @@ static ax_iter_t box_rbegin(ax_any_t* any)
 	ax_vector_t* vec = (ax_vector_t*)any;
 	ax_iter_t it;
 	it.owner = any;
-	it.point = vec->buffer + vec->size - vec->seq.elem_tr->size();
+	it.point = vec->buffer + (vec->size - 1) * vec->elem_size;
 	it.tr = &reverse_iter_trait;
 	return it;
 }
@@ -201,10 +200,23 @@ static ax_iter_t box_rend(ax_any_t* any)
 	ax_vector_t* vec = (ax_vector_t*)any;
 	ax_iter_t it;
 	it.owner = any;
-	it.point = vec->buffer - vec->seq.elem_tr->size();
+	it.point = vec->buffer - vec->elem_size;
 	it.tr = &reverse_iter_trait;
 	return it;
 }
+
+static void box_erase(ax_any_t* any, ax_iter_t* it)
+{
+	ax_vector_t* vec = (ax_vector_t*)any;
+	ax_assert(it->point >= vec->buffer + vec->size*vec->elem_size || it->point < vec->buffer, "bad iterator");
+	//delete
+	vec->seq.elem_tr->free(it->point);
+	for (void* p = it->point ; p < vec->buffer + vec->size - vec->elem_size ; p += vec->elem_size) {
+		vec->seq.elem_tr->move(p, p + vec->elem_size);
+	}
+	vec->size --;
+}
+
 
 static ax_box_trait_t box_trait = {
 	.size = box_size,
@@ -212,25 +224,24 @@ static ax_box_trait_t box_trait = {
 	.begin = box_begin,
 	.end = box_end,
 	.rbegin = box_rbegin,
-	.rend = box_rend
+	.rend = box_rend,
+	.erase = box_erase
 };
 
 static ax_bool_t seq_push(ax_any_t* any, void* e)
 {
 	ax_vector_t* vec = (ax_vector_t*)any;
-	size_t elem_size = vec->seq.elem_tr->size();
 
 	if (vec->size + 1 >= vec->capacity) {
-		size_t max = vec->seq.box.tr->maxsize(any);
-		if(vec->capacity + 1 > max) {
+		if(vec->capacity + 1 > vec->maxsize) {
 			return ax_false;
 		}
 		vec->capacity += 100;
-		if(vec->capacity > max)
-			vec->capacity = max;
-		vec->buffer = realloc(vec->buffer, vec->capacity * elem_size);
+		if(vec->capacity > vec->maxsize)
+			vec->capacity = vec->maxsize;
+		vec->buffer = realloc(vec->buffer, vec->capacity * vec->elem_size);
 	}
-	vec->seq.elem_tr->copy(vec->buffer + (vec->size * elem_size), e);
+	vec->seq.elem_tr->copy(vec->buffer + (vec->size * vec->elem_size), e);
 	vec->size ++;
 	return ax_true;
 }
@@ -275,11 +286,11 @@ ax_any_t* ax_vector_create(ax_vector_t* pt,const ax_basic_trait_t* elem_tr)
 	seq->tr = &seq_trait;
 	seq->elem_tr = elem_tr;
 
-	pt->maxsize = 1028;
-	//pt->elem_size = type == AX_BT_RAW ? raw_size : ax_basic_size(type);
-	pt->buffer = NULL;//malloc(10 * pt->seq.elem_tr->size());
-	pt->capacity = 0;//10;
+	pt->maxsize = box->tr->maxsize(any);
+	pt->buffer = NULL;
+	pt->capacity = 0;
 	pt->size = 0;
+	pt->elem_size = elem_tr->size();
 
 	return (ax_any_t*)pt;
 }

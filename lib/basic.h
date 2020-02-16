@@ -59,6 +59,7 @@ struct ax_basic_trait_st
 	ax_basic_hash_f  hash;
 	ax_basic_free_f  free; 
 	ax_basic_copy_f  copy;
+	ax_basic_copy_f  move;
 	ax_basic_tostr_f tostr;
 };
 typedef struct ax_basic_trait_st ax_basic_trait_t;

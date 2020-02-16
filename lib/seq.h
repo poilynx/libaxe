@@ -27,8 +27,12 @@ struct ax_seq_st
 	const ax_basic_trait_t* elem_tr;
 };
 
-#define ax_seq_push(_a, _e) (AX_TRAIT_FUN_PREFIX(ax_seq_push, (_a), AX_T_SEQ), ((ax_seq_t*)(_a))->tr->push(_a, (_e)))
-#define ax_seq_pop(_a) (AX_TRAIT_FUN_PREFIX(ax_seq_pop, (_a), AX_T_SEQ), ((ax_seq_t*)(_a))->tr->pop(_a))
-#define ax_seq_sort(_a) (AX_TRAIT_FUN_PREFIX(ax_seq_sort, (_a), AX_T_SEQ), ((ax_seq_t*)(_a))->tr->sort(_a))
+inline static ax_bool_t ax_seq_push(ax_any_t* a, void* e) { return ((ax_seq_t*)a)->tr->push(a, e); }
+inline static ax_bool_t ax_seq_pop(ax_any_t* a)           { return ((ax_seq_t*)a)->tr->pop(a); }
+inline static void ax_seq_sort(ax_any_t* a)          { ((ax_seq_t*)a)->tr->sort(a); }
+
+#define ax_seq_push(_a, _e) (ax_ptrace(ax_seq_push), ax_seq_push((_a), (_e)))
+#define ax_seq_pop(_a)      (ax_ptrace(ax_seq_pop), ax_seq_pop((_a)))
+#define ax_seq_sort(_a)     (ax_ptrace(ax_seq_sort), ax_seq_sort((_a)))
 
 #endif

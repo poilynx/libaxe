@@ -44,26 +44,23 @@ const char* ax_type_name(char type);
 ax_basic_trait_t* ax_any_basic_trait();
 
 #ifndef AX_NO_ASSERT
-static ax_bool_t ax__is_any(ax_any_t* any) {
+inline static ax_bool_t ax__is_any(ax_any_t* any) {
 	return any->magic[0] == 'A'
 		&& any->magic[1] == 'X'
 		&& any->magic[2] == '\0';
 }
 #endif
 
-#define AX_TRAIT_FUN_PREFIX(_f, _a, _t) \
-	(ax_ptrace(_f), \
-	ax_assert( \
-		ax__is_any(_a) && ax_IS(_a, _t), \
-		"can't convert type '%s' to '%s'", \
-		ax_type_name(_a->tr->type(_a)), \
-		ax_type_name(AX_T_ANY) \
-	))
+static inline void ax_free(ax_any_t *a) { a->tr->free(a); }
+static inline char ax_type(ax_any_t *a) { return a->tr->type(a); }
+static inline ax_any_t* ax_move(ax_any_t *a) { return a->tr->move(a); }
+static inline ax_any_t* ax_copy(ax_any_t *a) { return a->tr->copy(a); }
+static inline char* ax_name(ax_any_t *a) { return a->tr->name(a); }
 
-#define ax_free(_a)  (AX_TRAIT_FUN_PREFIX(ax_free, _a, AX_T_ANY), _a->tr->free(_a))
-#define ax_type(_a)  (AX_TRAIT_FUN_PREFIX(ax_type, _a, AX_T_ANY), _a->tr->type(_a))
-#define ax_move(_a)  (AX_TRAIT_FUN_PREFIX(ax_move, _a, AX_T_ANY), _a->tr->move(_a))
-#define ax_copy(_a)  (AX_TRAIT_FUN_PREFIX(ax_copy, _a, AX_T_ANY), _a->tr->copy(_a))
-#define ax_name(_a)  (AX_TRAIT_FUN_PREFIX(ax_name, _a, AX_T_ANY), _a->tr->name(_a))
+#define ax_free(_a)  (ax_ptrace(ax_free), ax_free(_a))
+#define ax_type(_a)  (ax_ptrace(ax_type), ax_type(_a))
+#define ax_move(_a)  (ax_ptrace(ax_move), ax_move(_a))
+#define ax_copy(_a)  (ax_ptrace(ax_copy), ax_copy(_a))
+#define ax_name(_a)  (ax_ptrace(ax_name), ax_name(_a))
 
 #endif
