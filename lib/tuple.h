@@ -1,6 +1,6 @@
 #ifndef TUPLE_H_
 #define TUPLE_H_
-#include "basic.h"
+#include "stuff.h"
 #define AX_TF_MUTABLE 0x01
 struct ax_tuple_st;
 typedef struct ax_tuple_st ax_tuple_t;
@@ -8,9 +8,8 @@ struct ax_vail_st;
 typedef struct ax_vail_st ax_vail_t;
 struct ax_tuple_item_st
 {
-	ax_basic_type_t type;
-	uint8_t flag;
-	char    label;
+	char type;
+	char flag;
 	size_t  count;
 	void*   ptr;
 };

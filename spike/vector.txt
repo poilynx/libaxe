@@ -1,0 +1,67 @@
+struct ax_iter_trait_st
+{
+	ax_iter_shift_f shift;
+	ax_iter_get_f   get;
+	ax_iter_comp_f  equal; //uz
+	ax_iter_comp_f  less;  //uz
+	ax_iter_dist_f  dist;
+	ax_iter_erase_f erase; //xz
+	ax_iter_postv_f postv; //az
+};
+
+struct ax_stuff_trait_st
+{
+	ax_stuff_size_f  size;
+	ax_stuff_type_f  type;
+	ax_stuff_comp_f  equal;
+	ax_stuff_comp_f  less;
+	ax_stuff_hash_f  hash;
+	ax_stuff_free_f  free; 
+	ax_stuff_copy_f  copy;
+	ax_stuff_copy_f  move;
+	ax_stuff_tostr_f tostr; //x
+	ax_stuff_text_f  text; //a
+};
+
+struct ax_any_trait_st
+{
+	ax_free_f   free;
+	ax_dump_f   dump;
+	ax_type_f   type;
+	ax_copy_f   copy;
+	ax_move_f   move;
+	ax_name_f   name;
+};
+
+struct ax_box_trait_st
+{
+	ax_box_size_f size;
+	ax_box_size_f maxsize;
+	ax_box_iter_f begin;
+	ax_box_iter_f end;
+	ax_box_iter_f rbegin;
+	ax_box_iter_f rend;
+	ax_box_erase_f erase; //u  return ax_iter_t
+	ax_box_clear_f clear; //a
+	ax_seq_at_f   at; //a ??
+};
+
+struct ax_seq_trait_st
+{
+	ax_seq_push_f push;
+	ax_seq_pop_f  pop;
+	ax_seq_sort_f sort;
+	ax_seq_find_f find; //a
+	ax_seq_revs_f revs; //a
+};
+
+struct ax_map_trait_st
+{
+	put;
+	get;
+	exist;
+	merge;
+	keys;
+	vals;
+	erase;
+}

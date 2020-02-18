@@ -1,6 +1,6 @@
 #include "tuple.h"
 #include "vail.h"
-#include "basic.h"
+#include "stuff.h"
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
@@ -18,7 +18,6 @@ ax_tuple_t* ax_tuple_make(ax_vail_t* vail)
 	for (i=vail->size-1; node; node=node->next, i--) {
 		t->table[i].ptr = stash_pos;
 		t->table[i].type = node->type;
-		t->table[i].label = node->label;
 		if (node->mut) {
 			t->table[i].flag = AX_TF_MUTABLE;
 			t->table[i].count = node->size;

@@ -2,9 +2,9 @@ AXE=..
 
 include $(AXE)/config.mak
 
-LDFLAGS= -shared -fpic
+#LDFLAGS= -shared -fpic
 
-OBJS= basic.o debug.o ref.o tuple.o type.o vail.o vector.o
+OBJS= stuff.o debug.o ref.o tuple.o type.o vail.o vector.o
 
 all: libaxe.a
 libaxe.a: $(OBJS)

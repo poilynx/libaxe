@@ -21,4 +21,5 @@ void ax__fault(const char*, const char*, int, const char*, const char*, ...);
 #undef ax_fault
 #define ax_fault(__f, ...) (ax__fault(__FILE__,  __FUNCTION__,__LINE__, "error", __f, ##__VA_ARGS__))
 
+
 #endif

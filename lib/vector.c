@@ -7,14 +7,15 @@
 static void iter_shift(ax_iter_t* it, int i)
 {
 	ax_vector_t* vec = it->owner;
-	it->point += (i * (vec->elem_size));
+	long off = (i * (vec->elem_size));
+	it->point += it->tr->norm ? + off : - off;
 }
 
 static ax_ref_t iter_get(const ax_iter_t* it, int i)
 {
 	ax_vector_t* vec = it->owner;
 	ax_ref_t ref;
-	ref.type = vec->seq.elem_tr->type();
+	ref.type = vec->seq.elem_tr->type;
 	ref.ptr = it->point;
 	return ref;
 }
@@ -26,63 +27,32 @@ static ax_bool_t iter_equal(const ax_iter_t* it1, const ax_iter_t* it2)
 
 static ax_bool_t iter_less(const ax_iter_t* it1, const ax_iter_t* it2)
 {
-
-	return it1->point < it2->point;
+	return it1->tr->norm ? (it1->point < it2->point) : (it1->point > it2->point);
 }
 
 static size_t iter_dist(const ax_iter_t* it1, const ax_iter_t* it2)
 {
-	return it2->point - it1->point;
+	long dist = it1->point - it2->point;
+	return it1->tr->norm ? dist : - dist;
 }
 
-static void iter_erase(ax_iter_t* it)
-{
-	ax_vector_t* vec = it->owner;
-	vec->seq.box.tr->erase(it->owner, it);
-}
 
-static ax_iter_trait_t iter_trait = {
+static const ax_iter_trait_t iter_trait = {
+	.norm = ax_true,
 	.shift = iter_shift,
 	.get = iter_get,
 	.equal = iter_equal,
 	.less = iter_less,
 	.dist = iter_dist,
-	.erase = iter_erase
 };
 
-
-static void riter_shift(ax_iter_t* it, int i)
-{
-	ax_vector_t* vec = it->owner;
-	it->point -= (i * (vec->elem_size));
-}
-
-static ax_bool_t riter_less(const ax_iter_t* it1, const ax_iter_t* it2)
-{
-
-	return it1->point > it2->point;
-}
-
-static size_t riter_dist(const ax_iter_t* it1, const ax_iter_t* it2)
-{
-	return it1->point - it2->point;
-}
-
-static void riter_erase(ax_iter_t* it)
-{
-	ax_vector_t* vec = it->owner;
-	vec->seq.box.tr->erase(it->owner, it);
-	it->point --;
-	
-}
-
-static ax_iter_trait_t reverse_iter_trait = {
-	.shift = riter_shift,
+static const ax_iter_trait_t reverse_iter_trait = {
+	.norm = ax_false,
+	.shift = iter_shift,
 	.get = iter_get,
 	.equal = iter_equal,
-	.less = riter_less,
-	.dist = riter_dist,
-	.erase = riter_erase
+	.less = iter_less,
+	.dist = iter_dist,
 };
 
 static void any_free(ax_any_t* any)
@@ -98,11 +68,6 @@ static void any_dump(const ax_any_t* any, int ind)
 	printf("dump\n");
 }
 
-static char any_type(const ax_any_t* any)
-{
-	return AX_T_SEQ;
-}
-
 static ax_any_t* any_copy(const ax_any_t* any)
 {
 
@@ -116,7 +81,6 @@ static ax_any_t* any_copy(const ax_any_t* any)
 
 static ax_any_t* any_move(ax_any_t* any)
 {
-	//check freed
 	ax_vector_t* old = (ax_vector_t*)any;
 	ax_vector_t* new = NULL;
 	if(old->seq.box.any.flags & AX_AF_NEED_FREE)
@@ -131,27 +95,9 @@ static ax_any_t* any_move(ax_any_t* any)
 		old->buffer = NULL;
 		old->seq.box.any.flags |= AX_AF_FREED;
 	}
-#ifndef AX_NO_DEBUG
-	new->seq.box.period ++;
-#endif
 	return (ax_any_t*)new;
 
 }
-
-static char* any_name(const ax_any_t* any)
-{
-	return "any_box_seq_vector";
-}
-
-static ax_any_trait_t any_treat = {
-	.free = any_free,
-	.dump = any_dump,
-	.type = any_type,
-	.copy = any_copy,
-	.move = any_move,
-	.name = any_name
-};
-
 
 static size_t box_size(ax_any_t* any)
 {
@@ -208,25 +154,16 @@ static ax_iter_t box_rend(ax_any_t* any)
 static void box_erase(ax_any_t* any, ax_iter_t* it)
 {
 	ax_vector_t* vec = (ax_vector_t*)any;
-	ax_assert(it->point >= vec->buffer + vec->size*vec->elem_size || it->point < vec->buffer, "bad iterator");
-	//delete
+	ax_assert(it->point >= vec->buffer && it->point < vec->buffer + vec->size*vec->elem_size, "bad iterator");
+	 
 	vec->seq.elem_tr->free(it->point);
 	for (void* p = it->point ; p < vec->buffer + vec->size - vec->elem_size ; p += vec->elem_size) {
 		vec->seq.elem_tr->move(p, p + vec->elem_size);
 	}
 	vec->size --;
+	if(!it->tr->norm)
+		it->point -= vec->elem_size;
 }
-
-
-static ax_box_trait_t box_trait = {
-	.size = box_size,
-	.maxsize = box_maxsize,
-	.begin = box_begin,
-	.end = box_end,
-	.rbegin = box_rbegin,
-	.rend = box_rend,
-	.erase = box_erase
-};
 
 static ax_bool_t seq_push(ax_any_t* any, void* e)
 {
@@ -260,13 +197,36 @@ static void seq_sort(ax_any_t* any)
 	printf("not implemented\n");
 }
 
-static ax_seq_trait_t seq_trait = {
+
+static const ax_any_trait_t any_treat = {
+	.type = AX_T_SEQ,
+	.name = "any_box_seq_vector",
+	.free = any_free,
+	.dump = any_dump,
+	.copy = any_copy,
+	.move = any_move,
+};
+
+
+
+static const ax_box_trait_t box_trait = {
+	.size = box_size,
+	.maxsize = box_maxsize,
+	.begin = box_begin,
+	.end = box_end,
+	.rbegin = box_rbegin,
+	.rend = box_rend,
+	.erase = box_erase
+};
+
+
+static const ax_seq_trait_t seq_trait = {
 	.push = seq_push,
 	.pop = seq_pop,
 	.sort = seq_sort
 };
 
-ax_any_t* ax_vector_create(ax_vector_t* pt,const ax_basic_trait_t* elem_tr)
+ax_any_t* ax_vector_create(ax_vector_t* pt,const ax_stuff_trait_t* elem_tr)
 {
 	if (pt == NULL) {
 		pt = malloc(sizeof(ax_vector_t));
@@ -290,7 +250,7 @@ ax_any_t* ax_vector_create(ax_vector_t* pt,const ax_basic_trait_t* elem_tr)
 	pt->buffer = NULL;
 	pt->capacity = 0;
 	pt->size = 0;
-	pt->elem_size = elem_tr->size();
+	pt->elem_size = elem_tr->size;
 
 	return (ax_any_t*)pt;
 }

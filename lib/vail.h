@@ -1,15 +1,13 @@
 #ifndef VAIL_H_
 #define VAIL_H_
 #include "def.h"
-#include "basic.h"
+#include "stuff.h"
 #include <stdint.h>
 #include <stddef.h>
 struct ax_vaf_item_st
 {
-	int8_t type;
-	int8_t mut;
-	uint8_t repeat;
-	char label;
+	char type;
+	char mut;
 };
 typedef struct ax_vaf_item_st ax_vaf_item_t;
 
@@ -25,8 +23,8 @@ struct ax_vail_node_st
 {
 	char mut;
 	char type;
-	char label;
-	ax_basic_t value;
+	//char label;
+	ax_stuff_t value;
 	size_t size;
 	struct ax_vail_node_st* next;
 };
@@ -35,7 +33,6 @@ typedef struct ax_vail_node_st ax_vail_node_t;
 #define ax_vail_node_set(p, m, t, l, v, s) \
 	((p)->mut = (m), \
 	(p)->type = (t), \
-	(p)->label = (l), \
 	(p)->value = (v), \
 	(p)->size = (s)) 
 

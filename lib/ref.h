@@ -1,7 +1,7 @@
 #ifndef REF_H_
 #define REF_H_
 #include "def.h"
-#include "basic.h"
+#include "stuff.h"
 #include <stdarg.h>
 struct ax_ref_st
 {

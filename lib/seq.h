@@ -3,8 +3,8 @@
 #include "type.h"
 #include "box.h"
 #include "debug.h"
-struct ax_basic_trait_st;
-typedef struct ax_basic_trait_st ax_basic_trait_t;
+struct ax_stuff_trait_st;
+typedef struct ax_stuff_trait_st ax_stuff_trait_t;
 struct ax_seq_st;
 typedef struct ax_seq_st ax_seq_t;
 
@@ -24,7 +24,7 @@ struct ax_seq_st
 {
 	ax_box_t box;
 	const ax_seq_trait_t* tr;
-	const ax_basic_trait_t* elem_tr;
+	const ax_stuff_trait_t* elem_tr;
 };
 
 inline static ax_bool_t ax_seq_push(ax_any_t* a, void* e) { return ((ax_seq_t*)a)->tr->push(a, e); }
