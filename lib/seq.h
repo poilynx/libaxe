@@ -33,12 +33,16 @@ typedef struct ax_seq_st ax_seq_t;
 typedef ax_bool_t(*ax_seq_push_f)(ax_any_t* any, void* e);
 typedef ax_bool_t(*ax_seq_pop_f)(ax_any_t* any);
 typedef void (*ax_seq_sort_f)(ax_any_t* any);
+typedef void (*ax_seq_invert_f)(ax_any_t* any);
+typedef ax_iter_t (*ax_seq_find_f)(ax_any_t* any, const void* val);
 
 struct ax_seq_trait_st
 {
 	ax_seq_push_f push;
 	ax_seq_pop_f  pop;
 	ax_seq_sort_f sort;
+	ax_seq_find_f find;
+	ax_seq_invert_f invert;
 };
 typedef struct ax_seq_trait_st ax_seq_trait_t;
 
@@ -52,8 +56,12 @@ struct ax_seq_st
 inline static ax_bool_t ax_seq_push(ax_any_t* a, void* e) { return ((ax_seq_t*)a)->tr->push(a, e); }
 inline static ax_bool_t ax_seq_pop(ax_any_t* a)           { return ((ax_seq_t*)a)->tr->pop(a); }
 inline static void ax_seq_sort(ax_any_t* a)               { ((ax_seq_t*)a)->tr->sort(a); }
+inline static ax_iter_t ax_seq_find(ax_any_t* a, const void* val){ return ((ax_seq_t*)a)->tr->find(a, val); }
+inline static void ax_seq_invert(ax_any_t* a)             { ((ax_seq_t*)a)->tr->invert(a); }
 
 #define ax_seq_push(_a, _e) (ax_ptrace(ax_seq_push), ax_seq_push((_a), (_e)))
 #define ax_seq_pop(_a)      (ax_ptrace(ax_seq_pop), ax_seq_pop((_a)))
 #define ax_seq_sort(_a)     (ax_ptrace(ax_seq_sort), ax_seq_sort((_a)))
+#define ax_seq_find(_a)     (ax_ptrace(ax_seq_find), ax_seq_find((_a)))
+#define ax_seq_invert(_a)   (ax_ptrace(ax_seq_sort), ax_seq_invert((_a)))
 #endif
