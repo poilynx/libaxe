@@ -6,7 +6,7 @@ struct ax_iter_trait_st
 	ax_iter_comp_f  less;  //uz
 	ax_iter_dist_f  dist;
 	ax_iter_erase_f erase; //xz
-	ax_iter_postv_f postv; //az
+	ax_iter_norm_f  norm; //az
 };
 
 struct ax_stuff_trait_st
@@ -19,18 +19,19 @@ struct ax_stuff_trait_st
 	ax_stuff_free_f  free; 
 	ax_stuff_copy_f  copy;
 	ax_stuff_copy_f  move;
-	ax_stuff_tostr_f tostr; //x
-	ax_stuff_text_f  text; //a
+	ax_stuff_tostr_f tostr; //xz
+	ax_stuff_text_f  text; //az
 };
 
 struct ax_any_trait_st
 {
+	const char* name;
+	const char  type;
+
 	ax_free_f   free;
 	ax_dump_f   dump;
-	ax_type_f   type;
 	ax_copy_f   copy;
 	ax_move_f   move;
-	ax_name_f   name;
 };
 
 struct ax_box_trait_st
@@ -41,8 +42,8 @@ struct ax_box_trait_st
 	ax_box_iter_f end;
 	ax_box_iter_f rbegin;
 	ax_box_iter_f rend;
-	ax_box_erase_f erase; //u  return ax_iter_t
-	ax_box_clear_f clear; //a
+	ax_box_erase_f erase; //uz  return ax_iter_t
+	ax_box_clear_f clear; //az
 	ax_seq_at_f   at; //a ??
 };
 

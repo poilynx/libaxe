@@ -1,3 +1,25 @@
+/*
+ * Copyright (c) 2020 Li hsilin <lihsilyn@gmail.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 #ifndef BOX_H_
 #define BOX_H_
 #include "def.h"
@@ -11,7 +33,9 @@ typedef struct ax_box_st ax_box_t;
 
 typedef size_t   (*ax_box_size_f)(ax_any_t* any);
 typedef ax_iter_t(*ax_box_iter_f)(ax_any_t* any);
-typedef void     (*ax_box_erase_f) (ax_any_t* any, ax_iter_t* iter);
+typedef ax_iter_t(*ax_box_erase_f) (ax_any_t* any, ax_iter_t* iter);
+typedef void     (*ax_box_clear_f)(ax_any_t* any);
+
 
 struct ax_box_trait_st
 {
@@ -23,6 +47,7 @@ struct ax_box_trait_st
 	ax_box_iter_f rbegin;
 	ax_box_iter_f rend;
 
+	ax_box_clear_f clear;
 	ax_box_erase_f erase;
 };
 typedef struct ax_box_trait_st ax_box_trait_t;

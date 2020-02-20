@@ -1,3 +1,25 @@
+/*
+ * Copyright (c) 2020 Li hsilin <lihsilyn@gmail.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 #include "vector.h"
 #include "iter.h"
 #include <string.h>
@@ -35,7 +57,6 @@ static size_t iter_dist(const ax_iter_t* it1, const ax_iter_t* it2)
 	long dist = it1->point - it2->point;
 	return it1->tr->norm ? dist : - dist;
 }
-
 
 static const ax_iter_trait_t iter_trait = {
 	.norm = ax_true,
@@ -151,18 +172,34 @@ static ax_iter_t box_rend(ax_any_t* any)
 	return it;
 }
 
-static void box_erase(ax_any_t* any, ax_iter_t* it)
+static ax_iter_t box_erase(ax_any_t* any, ax_iter_t* it)
 {
 	ax_vector_t* vec = (ax_vector_t*)any;
 	ax_assert(it->point >= vec->buffer && it->point < vec->buffer + vec->size*vec->elem_size, "bad iterator");
 	 
 	vec->seq.elem_tr->free(it->point);
-	for (void* p = it->point ; p < vec->buffer + vec->size - vec->elem_size ; p += vec->elem_size) {
+	size_t end = vec->buffer + vec->size - vec->elem_size;
+	for (void* p = it->point ; p < end ; p += vec->elem_size) {
 		vec->seq.elem_tr->move(p, p + vec->elem_size);
 	}
 	vec->size --;
 	if(!it->tr->norm)
 		it->point -= vec->elem_size;
+
+	return *it;
+}
+
+static void box_clear(ax_any_t* any)
+{
+	ax_vector_t* vec = (ax_vector_t*)any;
+	ax_assert(it->point >= vec->buffer && it->point < vec->buffer + vec->size*vec->elem_size, "bad iterator");
+	size_t end = vec->buffer + vec->size;
+	for (void* p = it->point ; p < end ; p += vec->elem_size) {
+		vec->seq.elem_tr->free(p, p + vec->elem_size);
+	}
+	free(vec->buffer);
+	vec->size = 0;
+	vec->capacity = 0;
 }
 
 static ax_bool_t seq_push(ax_any_t* any, void* e)
@@ -197,7 +234,6 @@ static void seq_sort(ax_any_t* any)
 	printf("not implemented\n");
 }
 
-
 static const ax_any_trait_t any_treat = {
 	.type = AX_T_SEQ,
 	.name = "any_box_seq_vector",
@@ -207,8 +243,6 @@ static const ax_any_trait_t any_treat = {
 	.move = any_move,
 };
 
-
-
 static const ax_box_trait_t box_trait = {
 	.size = box_size,
 	.maxsize = box_maxsize,
@@ -216,9 +250,9 @@ static const ax_box_trait_t box_trait = {
 	.end = box_end,
 	.rbegin = box_rbegin,
 	.rend = box_rend,
-	.erase = box_erase
+	.erase = box_erase,
+	.clear = box_clear
 };
-
 
 static const ax_seq_trait_t seq_trait = {
 	.push = seq_push,
@@ -231,7 +265,6 @@ ax_any_t* ax_vector_create(ax_vector_t* pt,const ax_stuff_trait_t* elem_tr)
 	if (pt == NULL) {
 		pt = malloc(sizeof(ax_vector_t));
 		pt->seq.box.any.flags = AX_AF_NEED_FREE;
-		
 	}
 	pt->seq.box.any.flags = 0;
 
