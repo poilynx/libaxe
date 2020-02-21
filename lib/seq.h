@@ -22,7 +22,7 @@
 
 #ifndef SEQ_H_
 #define SEQ_H_
-#include "type.h"
+#include "any.h"
 #include "box.h"
 #include "debug.h"
 struct ax_stuff_trait_st;
