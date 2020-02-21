@@ -26,7 +26,7 @@ void ax__ptrace(const char*, const char*, int, const char*);
 void ax__fault(const char*, const char*, int, const char*, const char*, ...);
 
 #undef ax_assert
-#ifdef AX_NO_DEBUG
+#ifdef AX_DEBUG
 # define ax_assert(__e, __f) ((void)0)
 #else
 # define ax_assert(__e, __f, ...) ((__e) \

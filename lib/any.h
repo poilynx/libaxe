@@ -20,8 +20,8 @@
  * THE SOFTWARE.
  */
 
-#ifndef TYPE_H_
-#define TYPE_H_
+#ifndef ANY_H_
+#define ANY_H_
 #include "def.h"
 
 #define AX_T_ANY 0

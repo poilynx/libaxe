@@ -26,7 +26,33 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+//static void box_clear(ax_any_t* any);
+
+
 static void box_clear(ax_any_t* any);
+static ax_bool_t seq_push(ax_any_t* any, void* e);
+static ax_bool_t seq_pop(ax_any_t* any);
+static void seq_sort(ax_any_t* any);
+
+static size_t box_size(ax_any_t* any);
+static size_t box_maxsize(ax_any_t* any);
+static ax_iter_t box_begin(ax_any_t* any);
+static ax_iter_t box_end(ax_any_t* any);
+static ax_iter_t box_rbegin(ax_any_t* any);
+static ax_iter_t box_rend(ax_any_t* any);
+static ax_iter_t box_erase(ax_any_t* any, ax_iter_t* it);
+
+
+static void any_free(ax_any_t* any);
+static void any_dump(const ax_any_t* any, int ind);
+static ax_any_t* any_copy(const ax_any_t* any);
+static ax_any_t* any_move(ax_any_t* any);
+
+static void iter_shift(ax_iter_t* it, int i);
+static ax_ref_t iter_get(const ax_iter_t* it, int i);
+static ax_bool_t iter_equal(const ax_iter_t* it1, const ax_iter_t* it2);
+static ax_bool_t iter_less(const ax_iter_t* it1, const ax_iter_t* it2);
+static size_t iter_dist(const ax_iter_t* it1, const ax_iter_t* it2);
 
 static void iter_shift(ax_iter_t* it, int i)
 {
