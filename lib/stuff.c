@@ -43,9 +43,10 @@ char* ax_stuff_name(ax_stuff_type_t type)
 		case AX_ST_LF:   return "double";
 		case AX_ST_LLF:  return "long_double";
 		case AX_ST_STR:  return "char[]";
-		case AX_ST_PTR:  return "void*";
 		case AX_ST_RAW:  return "raw_data";
-		default:         return "unknow_type";
+		case AX_ST_PTR: 
+		case AX_ST_PWL:
+		default:         return "void*";
 	}
 }
 
@@ -69,7 +70,8 @@ size_t ax_stuff_size(ax_stuff_type_t type)
 		case AX_ST_PTR:  return sizeof(void*);
 		case AX_ST_RAW:  return sizeof(unsigned char);
 	}
-	ax_fault("Unrecognized type %d", type);
+	ax_perror("Unrecognized type %d", type);
+	ax_abort();
 	return 0;
 }
 
@@ -94,16 +96,6 @@ size_t ax_stuff_va_read(ax_stuff_type_t type, ax_stuff_t* stuff, va_list arg)
 		case AX_ST_F:   stuff->f   = (float)va_arg(va, double); break;
 		case AX_ST_LF:  stuff->lf  = va_arg(va, double); break;
 		case AX_ST_LLF: stuff->llf = va_arg(va, long double); break;
-		case AX_ST_PTR: stuff->ptr = va_arg(va, void*); break;
-		case AX_ST_STR: 
-		{
-			char* str = va_arg(va, void*);
-			size = strlen(str) + sizeof('\0');
-			char* buf = malloc(size);
-			memcpy(buf, str, size);
-			stuff->str = buf;
-			break;
-		}
 		case AX_ST_RAW:
 		{
 			void* p = va_arg(va, void*);
@@ -113,7 +105,16 @@ size_t ax_stuff_va_read(ax_stuff_type_t type, ax_stuff_t* stuff, va_list arg)
 			stuff->raw = buf;
 			break;
 		}
-		break;
+		case AX_ST_STR: 
+		{
+			char* str = va_arg(va, void*);
+			size = strlen(str) + sizeof('\0');
+			char* buf = malloc(size);
+			memcpy(buf, str, size);
+			stuff->str = buf;
+			break;
+		}
+		default: stuff->ptr = va_arg(va, void*); break;
 	}
 	va_end(va);
 	return size;
@@ -298,7 +299,7 @@ DECLARE_TRAIT_STRUCT(str)
 DECLARE_TRAIT_STRUCT(ptr)
 
 /* -- Define functions that get trait structure pointer -- */
-const ax_stuff_trait_t* ax_stuff_get_trait(char type)
+const ax_stuff_trait_t* ax_stuff_trait(ax_stuff_type_t type)
 {
 	switch(type) {
 		case AX_ST_NIL:  return &trait_nil;

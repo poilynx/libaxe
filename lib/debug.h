@@ -22,26 +22,59 @@
 
 #ifndef DEBUG_H_
 #define DEBUG_H_
-void ax__ptrace(const char*, const char*, int, const char*);
-void ax__fault(const char*, const char*, int, const char*, const char*, ...);
+#include <stddef.h>
+#include <stdio.h>
+/* --- For this library --- */
+
+#define AX_LM_INFO     0
+#define AX_LM_WARNING  1
+#define AX_LM_ERROR    2
+int  ax_debug_trace;
+void ax_debug_set_fd(FILE* fp);
+void ax_debug_pwhere();
+void ax_debug_step(const char* file, const char* caller, int line, const char* callee);
+void ax_debug_log(int level, const char*, ...);
+void ax_debug_abort();
+void ax_debug_assert_fail(const char* file, const char* func, int line, const char* brief, const char* fmt, ...);
+
+#define ax_abort ax_debug_abort
+
+#ifdef AX_DEBUG
+#define ax_pinfo(_f, ...)             (ax_debug_trace ? ax_debug_log(AX_LM_INFO, (_f), ##__VA_ARGS__) : (void)0)
+#define ax_pwarning(_f, ...)          (ax_debug_trace ? ax_debug_log(AX_LM_WARNING, (_f), ##__VA_ARGS__) : (void)0)
+#define ax_perror(_f, ...)            (ax_debug_trace ? ax_debug_log(AX_LM_ERROR, (_f), ##__VA_ARGS__) : (void)0)
+#define ax_pinfo_if(_c, _f, ...)      ((ax_debug_trace && (_c)) ? ax_debug_log(LOG_INFO, (_f), ##__VA_ARGS__) : (void)0)
+#define ax_pwarning_if(_c, _f, ...)   ((ax_debug_trace && (_c)) ? ax_debug_log(LOG_WARN, (_f), ##__VA_ARGS__) : (void)0)
+#define ax_perror_if(_c, _f, ...)     ((ax_debug_trace && (_c)) ? ax_debug_log(LOG_ERROR, (_f), ##__VA_ARGS__) : (void)0)
+#define ax_panic_if(_c, _lm, _f, ...) (ax_debug_trace \
+		? ((_c) ? ax_debug_log((_lm), (_f), ##__VA_ARGS__), ax_abort(): (void)0) \
+		: ((_c) ? ax_abort(): (void)0))
+#else
+#define ax_pinfo(_f, ...)             (void)0
+#define ax_pwarning(_f, ...)          (void)0
+#define ax_perror(_f, ...)            (void)0
+#define ax_pinfo_if(_c, _f, ...)      (void)0
+#define ax_pwarn_if(_c, _f, ...)      (void)0
+#define ax_perror_if(_c, _f, ...)     (void)0
+#define ax_panic_if(_c, _lm, _f, ...) (void)0
+#endif
+
+#ifdef AX_TRACE
+# define ax_step(__c) ax_debug_step(__FILE__, __FUNCTION__, __LINE__, #__c)
+#else
+# define ax_step(__c) ((void)0)
+#endif
+
+
+
+/* --- For user --- */
 
 #undef ax_assert
 #ifdef AX_DEBUG
-# define ax_assert(__e, __f) ((void)0)
-#else
 # define ax_assert(__e, __f, ...) ((__e) \
-	? (void)0 : ax__fault(__FILE__, __FUNCTION__, __LINE__, "assertion failed", __f, ##__VA_ARGS__))
-#endif
-
-#undef ax_ptrace
-#ifndef AX_TRACE
-# define ax_ptrace(__c) ((void)0)
+	? (void)0 : ax_debug_assert_fail(__FILE__, __FUNCTION__, __LINE__, "assertion failed", __f, ##__VA_ARGS__))
 #else
-# define ax_ptrace(__c) ax__ptrace(__FILE__, __FUNCTION__, __LINE__, #__c)
+# define ax_assert(__e, __f, ...) ((void)0)
 #endif
-
-#undef ax_fault
-#define ax_fault(__f, ...) (ax__fault(__FILE__,  __FUNCTION__,__LINE__, "error", __f, ##__VA_ARGS__))
-
 
 #endif

@@ -59,9 +59,10 @@ inline static void ax_seq_sort(ax_any_t* a)               { ((ax_seq_t*)a)->tr->
 inline static ax_iter_t ax_seq_find(ax_any_t* a, const void* val){ return ((ax_seq_t*)a)->tr->find(a, val); }
 inline static void ax_seq_invert(ax_any_t* a)             { ((ax_seq_t*)a)->tr->invert(a); }
 
-#define ax_seq_push(_a, _e) (ax_ptrace(ax_seq_push), ax_seq_push((_a), (_e)))
-#define ax_seq_pop(_a)      (ax_ptrace(ax_seq_pop), ax_seq_pop((_a)))
-#define ax_seq_sort(_a)     (ax_ptrace(ax_seq_sort), ax_seq_sort((_a)))
-#define ax_seq_find(_a)     (ax_ptrace(ax_seq_find), ax_seq_find((_a)))
-#define ax_seq_invert(_a)   (ax_ptrace(ax_seq_sort), ax_seq_invert((_a)))
+#define ax_seq_push(_a, _e) (ax_step(ax_seq_push), ax_seq_push((_a), (_e)))
+#define ax_seq_pop(_a)      (ax_step(ax_seq_pop), ax_seq_pop((_a)))
+#define ax_seq_sort(_a)     (ax_step(ax_seq_sort), ax_seq_sort((_a)))
+#define ax_seq_find(_a)     (ax_step(ax_seq_find), ax_seq_find((_a)))
+#define ax_seq_invert(_a)   (ax_step(ax_seq_sort), ax_seq_invert((_a)))
+
 #endif

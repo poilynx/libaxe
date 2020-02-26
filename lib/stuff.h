@@ -89,6 +89,6 @@ typedef struct ax_stuff_trait_st ax_stuff_trait_t;
 char*  ax_stuff_name (ax_stuff_type_t type);
 size_t ax_stuff_size (ax_stuff_type_t type);
 void   ax_stuff_set(char type, ax_stuff_t* stuff, va_list arg);
-const ax_stuff_trait_t* ax_stuff_get_trait(char type);
+const ax_stuff_trait_t* ax_stuff_trait(ax_stuff_type_t type);
 
 #endif

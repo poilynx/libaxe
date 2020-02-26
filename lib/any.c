@@ -22,10 +22,11 @@
 
 #include "any.h"
 #include "stuff.h"
+#include "debug.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-ax_bool_t ax_IS(ax_any_t* any, char type)
+ax_bool_t ax_IS(const ax_any_t* any, char type)
 {
 	switch(any->tr->type) {
 		case AX_T_ANY:
@@ -61,13 +62,32 @@ ax_bool_t ax_IS(ax_any_t* any, char type)
 const char* ax_type_name(char type)
 {
 	switch(type) {
-		case AX_T_ANY: return "any";
-		case AX_T_BOX: return "any_box";
-		case AX_T_SEQ: return "any_box_seq";
-		case AX_T_MAP: return "any_box_map";
+		case AX_T_ANY: return "!any";
+		case AX_T_BOX: return "!any.box";
+		case AX_T_SEQ: return "!any.box.seq";
+		case AX_T_MAP: return "!any.box.map";
 		default: return "unknow";
 	}
 }
+
+ax_bool_t ax_any_check_magic(const ax_any_t* any)
+{
+	return any->magic[0] == 'A' && any->magic[1] == 'X' && any->magic[2] == '\0';
+}
+
+#ifdef AX_DEBUG
+void ax_assert_type(const ax_any_t* any, char type)
+{
+	if (ax_any_check_magic(any) == ax_false) {
+		ax_perror("Invalid !any pointer");
+		ax_abort();
+	}
+	if (ax_IS(any, type) == ax_false) {
+		ax_perror("Not a %s, but %s", ax_type_name(type), ax_any_name(any));
+		ax_abort();
+	}
+}
+#endif
 
 static ax_bool_t stuff_equal(const void* e1, const void* e2)
 {
@@ -116,3 +136,4 @@ ax_stuff_trait_t* ax_any_stuff_trait()
 {
 	return &any_stuff_trait;
 }
+

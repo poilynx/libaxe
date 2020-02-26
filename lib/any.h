@@ -59,26 +59,29 @@ struct ax_any_st
 	const ax_any_trait_t* tr;
 };
 
-ax_bool_t ax_IS(ax_any_t* any, char type);
+ax_bool_t ax_IS(const ax_any_t* any, char type);
 const char* ax_type_name(char type);
 ax_stuff_trait_t* ax_any_stuff_trait();
+ax_bool_t ax_any_check_magic(const ax_any_t* any);
 
-inline static ax_bool_t ax_is_any(ax_any_t* any) {
-	return any->magic[0] == 'A'
-		&& any->magic[1] == 'X'
-		&& any->magic[2] == '\0';
-}
 
 static inline void      ax_any_free(ax_any_t *a) { a->tr->free(a); }
 static inline char      ax_any_type(ax_any_t *a) { return a->tr->type; }
 static inline ax_any_t* ax_any_move(ax_any_t *a) { return a->tr->move(a); }
 static inline ax_any_t* ax_any_copy(ax_any_t *a) { return a->tr->copy(a); }
-static inline const char* ax_any_name(ax_any_t *a) { return a->tr->name; }
+static inline const char* ax_any_name(const ax_any_t *a) { return a->tr->name; }
 
-#define ax_any_free(_a) (ax_ptrace(ax_any_free), ax_any_free(_a))
-#define ax_any_type(_a) (ax_ptrace(ax_any_type), ax_any_type(_a))
-#define ax_any_move(_a) (ax_ptrace(ax_any_move), ax_any_move(_a))
-#define ax_any_copy(_a) (ax_ptrace(ax_any_copy), ax_any_copy(_a))
-#define ax_any_name(_a) (ax_ptrace(ax_any_name), ax_any_name(_a))
+#define ax_any_free(_a) (ax_step(ax_any_free), ax_any_free(_a))
+#define ax_any_type(_a) (ax_step(ax_any_type), ax_any_type(_a))
+#define ax_any_move(_a) (ax_step(ax_any_move), ax_any_move(_a))
+#define ax_any_copy(_a) (ax_step(ax_any_copy), ax_any_copy(_a))
+#define ax_any_name(_a) (ax_step(ax_any_name), ax_any_name(_a))
+
+#ifdef AX_DEBUG
+void ax_assert_type(const ax_any_t* any, char type);
+# define AX_BEGIN_TRAIT(_any, _id, _type, _name)  ax_assert_type((_any), (_id)); _type _name = (_type)(_any);
+#else
+# define AX_BEGIN_TRAIT(_any, _id, _type, _name) _type _name = (_type)(_any);
+#endif
 
 #endif

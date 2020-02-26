@@ -58,11 +58,11 @@ inline static ax_bool_t ax_iter_equal(const ax_iter_t* it1, const ax_iter_t* it2
 inline static ax_bool_t ax_iter_less(const ax_iter_t* it1, const ax_iter_t* it2) { return it1->tr->equal(it1, it2); }
 inline static size_t ax_iter_dist(const ax_iter_t* it1, const ax_iter_t* it2) { return it1->tr->dist(it1, it2); }
 
-#define ax_iter_norm(it)       (ax_ptrace(ax_iter_norm),  ax_iter_norm(it))
-#define ax_iter_shift(it, i)   (ax_ptrace(ax_iter_shift), ax_iter_shift((it), (i)))
-#define ax_iter_get(it, i)     (ax_ptrace(ax_iter_get),   ax_iter_get(it, i))
-#define ax_iter_equal(it1, it2)(ax_ptrace(ax_iter_equal), ax_iter_equal(it1, it2))
-#define ax_iter_less(it1, it2) (ax_ptrace(ax_iter_less),  ax_iter_less(it1, it2))
-#define ax_iter_dist(it1, it2) (ax_ptrace(ax_iter_dist),  ax_iter_dist(it1, it2))
+#define ax_iter_norm(it)       (ax_step(ax_iter_norm),  ax_iter_norm(it))
+#define ax_iter_shift(it, i)   (ax_step(ax_iter_shift), ax_iter_shift((it), (i)))
+#define ax_iter_get(it, i)     (ax_step(ax_iter_get),   ax_iter_get(it, i))
+#define ax_iter_equal(it1, it2)(ax_step(ax_iter_equal), ax_iter_equal(it1, it2))
+#define ax_iter_less(it1, it2) (ax_step(ax_iter_less),  ax_iter_less(it1, it2))
+#define ax_iter_dist(it1, it2) (ax_step(ax_iter_dist),  ax_iter_dist(it1, it2))
 
 #endif

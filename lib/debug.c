@@ -24,23 +24,87 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
-void ax__fault(const char* file, const char* func, int line, const char* brief, const char* fmt, ...)
+struct ax_where_st {
+	const char* file;
+	const char* caller;
+	const char* callee;
+	int line;
+};
+
+static struct ax_where_st g_where;
+static FILE* g_fp = NULL;
+
+int ax_debug_trace = 0;
+
+void ax_debug_set_fd(FILE* fp)
+{
+	g_fp = fp;
+}
+
+void ax_debug_pwhere()
+{
+	if(!g_fp) return ;
+	fprintf(g_fp, "%s:%s:%d:%s:",
+			g_where.file,
+			g_where.caller,
+			g_where.line,
+			g_where.callee);
+}
+
+void ax_debug_step(const char* file, const char* caller, int line, const char* callee)
+{
+	g_where.file = file;
+	g_where.caller = caller;
+	g_where.callee = callee;
+	g_where.line = line;
+}
+
+void ax_debug_log(int level, const char* fmt, ...)
+{
+	if(!g_fp) return ;
+	va_list vl;
+	va_start(vl, fmt);
+	char log_level[32];
+	switch(level)
+	{
+		case AX_LM_INFO:    strcpy(log_level, "info"); break;
+		case AX_LM_WARNING: strcpy(log_level, "warning"); break;
+		case AX_LM_ERROR:   strcpy(log_level, "error"); break;
+		default:            sprintf(log_level, "log<%d>", level); break;
+	}
+
+	fputs("ax:", g_fp);
+	ax_debug_pwhere();
+	fputs(log_level, g_fp);
+	fputc(':', g_fp);
+	vfprintf(g_fp, fmt, vl);
+	fputc('\n', g_fp);
+
+	va_end(vl);
+}
+
+void ax_debug_abort()
+{
+	if(g_fp) {
+		fputs("ax:", g_fp);
+		ax_debug_pwhere();
+		fputs("abort\n", g_fp);
+	}
+	exit(-1);
+}
+
+void ax_debug_assert_fail(const char* file, const char* func, int line, const char* brief, const char* fmt, ...)
 {
 	va_list vl;
 	va_start(vl, fmt);
 
-	char err[512];
-	vsnprintf(err, sizeof(err), fmt, vl);
-	fprintf(stderr, "ax:fault:%s:%s:%d:%s: %s\n", file, func, line, brief, err);
+	fprintf(stderr, "%s:%s:%d:%s:", file, func, line, brief);
+	fprintf(stderr, fmt, vl);
+	fputc('\n', stderr);
 
 	va_end(vl);
 
 	abort();
 }
-
-void ax__ptrace(const char* file, const char* func, int line, const char* call)
-{
-	fprintf(stderr, "ax:trace:%s:%s:%d: call %s\n", file, func, line, call);
-}
-

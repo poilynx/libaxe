@@ -176,13 +176,16 @@ end_type_scan:
 	return vaf;
 too_many_arg:
 	free(vaf);
-	ax_fault("too many argument, limited to 127");
+	ax_perror("too many argument, limited to 127");
+	ax_abort();
 bad_char:
 	free(vaf);
 	char badch[3] = {fmt[pos]};
 	if (fmt[pos] == '\0')
 		badch[0] = '\\', badch[1] = '0';
-	ax_fault("unexpected #%d character '%s' in format string \"%s\"", pos+1, badch, fmt);
+	(void)badch;
+	ax_perror("unexpected #%d character '%s' in format string \"%s\"", pos+1, badch, fmt);
+	ax_abort();
 	return NULL;
 }
 

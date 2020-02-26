@@ -67,12 +67,12 @@ static inline void      ax_box_clear(ax_any_t* a) { ((ax_box_t*)(a))->tr->clear(
 static inline ax_iter_t ax_box_erase(ax_any_t* a, ax_iter_t* it) { return ((ax_box_t*)(a))->tr->erase(a, it); }
 
 
-#define ax_box_begin(_a)      (ax_ptrace(ax_box_begin), ax_box_begin((_a)))
-#define ax_box_end(_a)        (ax_ptrace(ax_box_end), ax_box_end((_a)))
-#define ax_box_rbegin(_a)     (ax_ptrace(ax_box_rbegin), ax_box_rbegin((_a)))
-#define ax_box_rend(_a)       (ax_ptrace(ax_box_rend), ax_box_rend((_a)))
-#define ax_box_size(_a)       (ax_ptrace(ax_box_size), ax_box_size((_a)))
-#define ax_box_clear(_a)      (ax_ptrace(ax_box_clear), ax_box_clear((_a)))
-#define ax_box_erase(_a, _it) (ax_ptrace(ax_box_erase), ax_box_erase((_a), (_it)))
+#define ax_box_begin(_a)      (ax_step(ax_box_begin), ax_box_begin((_a)))
+#define ax_box_end(_a)        (ax_step(ax_box_end), ax_box_end((_a)))
+#define ax_box_rbegin(_a)     (ax_step(ax_box_rbegin), ax_box_rbegin((_a)))
+#define ax_box_rend(_a)       (ax_step(ax_box_rend), ax_box_rend((_a)))
+#define ax_box_size(_a)       (ax_step(ax_box_size), ax_box_size((_a)))
+#define ax_box_clear(_a)      (ax_step(ax_box_clear), ax_box_clear((_a)))
+#define ax_box_erase(_a, _it) (ax_step(ax_box_erase), ax_box_erase((_a), (_it)))
 
 #endif
