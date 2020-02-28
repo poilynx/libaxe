@@ -120,6 +120,12 @@ size_t ax_stuff_va_read(ax_stuff_type_t type, ax_stuff_t* stuff, va_list arg)
 	return size;
 }
 
+ax_stuff_type_t ax_stuff_pwl(char c)
+{
+	return (c >= 'A' && c <= 'Z') ? c - 'A' + AX_ST_PWL : AX_ST_PTR;
+}
+	
+
 
 static void do_nothing() { }
 

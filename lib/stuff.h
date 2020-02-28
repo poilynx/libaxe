@@ -45,7 +45,6 @@ typedef uint8_t ax_stuff_type_t;
 #define AX_ST_PTR   15
 #define AX_ST_PWL   16
 
-
 union ax_stuff_u
 {
 	int8_t   i8;
@@ -86,6 +85,7 @@ struct ax_stuff_trait_st
 };
 typedef struct ax_stuff_trait_st ax_stuff_trait_t;
 
+ax_stuff_type_t ax_stuff_pwl(char c);
 char*  ax_stuff_name (ax_stuff_type_t type);
 size_t ax_stuff_size (ax_stuff_type_t type);
 void   ax_stuff_set(char type, ax_stuff_t* stuff, va_list arg);
