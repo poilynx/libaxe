@@ -20,20 +20,10 @@
  * THE SOFTWARE.
  */
 
-#ifndef BASE_H_
-#define BASE_H_
-#include <stdint.h>
-#include <stddef.h>
+#include "def.h"
 
-typedef enum { ax_false, ax_true } ax_bool_t;
-typedef long double longd_t;
-
-struct ax_string_table_st {
-	char* unknow;
-	char* uncompatable_type;
+const struct ax_string_table_st ax_strtab = {
+	.unknow = "Unknow",
+	.uncompatable_type = "Uncompatable type",
 };
 
-const struct ax_string_table_st ax_strtab;
-
-int ax__init_count();
-#endif
