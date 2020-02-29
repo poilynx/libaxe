@@ -37,10 +37,10 @@ typedef struct ax_ref_st ax_ref_t;
 
 #ifdef AX_DEBUG
 # define ax_ref_make(_p, _t) (struct ax_ref_st){ _p, _t }
-# define ax_ref_check(_r, _t) ax_panic_if((r).d_type != (_t), AX_LM_ERROR, ax_strtab.uncompatable_type)
+# define ax_ref_check(_r, _t) ax_panic_if((_r).d_type != (_t), AX_LM_ERROR, ax_strtab.uncompatable_type)
 #else
+# define ax_ref_make(_p, _t) (struct ax_ref_st){ _p }
 # define ax_ref_check(_r, _t) ((void)0)
-# define ax_ref_inizer(_p, _t) (struct ax_ref_st){ _p }
 #endif
 
 inline static void     ax_rget_nil(ax_ref_t r) { ax_ref_check(r, AX_ST_NIL); return (void)0; }

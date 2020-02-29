@@ -24,7 +24,7 @@ include $(AXE)/config.mak
 
 #LDFLAGS= -shared -fpic
 
-OBJS= stuff.o debug.o ref.o tuple.o any.o vail.o vector.o axe.o
+OBJS= def.o stuff.o debug.o tuple.o any.o vail.o vector.o axe.o
 
 all: libaxe.a
 libaxe.a: $(OBJS)

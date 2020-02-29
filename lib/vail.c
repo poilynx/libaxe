@@ -280,7 +280,7 @@ void ax_vail_free(ax_vail_t* vail) {
 }
 
 #include <stdio.h>
-int main() {
+void test() {
 	ax_vaf_t* vaf = ax_vaf_make("llf_i8_&i8.sx3_i32");
 	printf("argc = %hhd\n", vaf->argc);
 	for(int i = 0; i< vaf->argc; i++) {
