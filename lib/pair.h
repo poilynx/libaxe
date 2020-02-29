@@ -22,9 +22,24 @@
 
 #ifndef PAIR_H_
 #define PAIR_H_
-struct ax_pair_st
-{
-
-}
+#include "stuff.h"
+#include "ref.h"
+struct ax_pair_st {};
 typedef struct ax_pair_st ax_pair_t;
+
+typedef ax_ref_t(*ax_pair_field_f)(ax_pair_t* pair);
+struct ax_pair_trait_st
+{
+	ax_pair_field_f key;
+	ax_pair_field_f value;
+};
+typedef struct ax_pair_trait_st ax_pair_trait_t;
+
+
+inline static ax_pair_t* ax_rget_pair(ax_ref_t r) { ax_ref_check(r, ax_stuff_pwl('P')); return r.ptr; }
+inline static ax_ref_t ax_rset_pair(ax_pair_t*  p) { return ax_ref_make(p, ax_stuff_pwl('P')); }
+
+#define ax_rget_pair(_r)  (ax_step(ax_rset_pair), ax_rget_pair((_r)))
+#define ax_rset_pair(_p) (ax_step(ax_rset_pair), ax_rset_pair((_p))) 
+
 #endif
