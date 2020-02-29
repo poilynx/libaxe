@@ -65,8 +65,6 @@ void ax_debug_assert_fail(const char* file, const char* func, int line, const ch
 # define ax_step(__c) ((void)0)
 #endif
 
-
-
 /* --- For user --- */
 
 #undef ax_assert

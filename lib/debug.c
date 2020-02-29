@@ -87,11 +87,13 @@ void ax_debug_log(int level, const char* fmt, ...)
 
 void ax_debug_abort()
 {
-	if(g_fp) {
+#ifdef AX_DEBUG
+	if(g_fp && ax_debug_trace) {
 		fputs("ax:", g_fp);
 		ax_debug_pwhere();
 		fputs("abort\n", g_fp);
 	}
+#endif
 	exit(-1);
 }
 
