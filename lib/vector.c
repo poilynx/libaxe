@@ -20,17 +20,22 @@
  * THE SOFTWARE.
  */
 #include "vector.h"
+#include "ref.h"
 #include "any.h"
 #include "iter.h"
 #include "debug.h"
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#ifdef AX_DEBUG
+#define BEGIN_TRAIT(_a) ax_assert_type((_a), AX_T_SEQ); ax_vector_t* vec = (ax_vector_t*)any;
+#else
+#define BEGIN_TRAIT(_a) ax_vector_t* vec = (ax_vector_t*)any;
 
-#define BEGIN_TRAIT(_a) AX_BEGIN_TRAIT((_a), AX_T_SEQ, ax_vector_t*, vec)
+#endif
 
 static void box_clear(ax_any_t* any);
-static ax_bool_t seq_push(ax_any_t* any, void* e);
+static ax_bool_t seq_push(ax_any_t* any, ax_ref_t elem);
 static ax_bool_t seq_pop(ax_any_t* any);
 static void seq_sort(ax_any_t* any);
 
@@ -70,7 +75,7 @@ static ax_ref_t iter_get(const ax_iter_t* it, int i)
 {
 	ax_vector_t* vec = it->owner;
 	ax_ref_t ref;
-	ref.type = vec->seq.elem_tr->type;
+	ref.d_type = vec->seq.elem_tr->type;
 	ref.ptr = it->point;
 	return ref;
 }
@@ -140,7 +145,8 @@ static ax_any_t* any_copy(const ax_any_t* any)
 
 static ax_any_t* any_move(ax_any_t* any)
 {
-	AX_BEGIN_TRAIT(any, AX_T_SEQ,  ax_vector_t*, old);
+	BEGIN_TRAIT(any);
+	ax_vector_t* old = vec;
 	ax_vector_t* new = NULL;
 	if(old->seq.box.any.flags & AX_AF_NEED_FREE)
 		new = old;
@@ -218,7 +224,7 @@ static ax_iter_t box_erase(ax_any_t* any, ax_iter_t* it)
 			AX_LM_ERROR, "invalid iterator");
 	 
 	vec->seq.elem_tr->free(it->point);
-	void* end = vec->buffer + vec->size - vec->elem_size;
+	void* end = vec->buffer + (vec->size - 1) * vec->elem_size;
 	for (void* p = it->point ; p < end ; p += vec->elem_size) {
 		vec->seq.elem_tr->move(p, p + vec->elem_size);
 	}
@@ -244,10 +250,10 @@ static void box_clear(ax_any_t* any)
 	}
 }
 
-static ax_bool_t seq_push(ax_any_t* any, void* e)
+static ax_bool_t seq_push(ax_any_t* any, ax_ref_t elem)
 {
 	BEGIN_TRAIT(any);
-	
+	ax_ref_check(elem, vec->seq.elem_tr->type);
 	if (vec->size + 1 >= vec->capacity) {
 		if(vec->capacity + 1 > vec->maxsize) {
 			ax_pwarning("has reached the maximum size of %hd", box_maxsize(any));
@@ -259,7 +265,7 @@ static ax_bool_t seq_push(ax_any_t* any, void* e)
 		vec->buffer = realloc(vec->buffer, vec->capacity * vec->elem_size);
 		ax_pinfo("memory is realloced");
 	}
-	vec->seq.elem_tr->copy(vec->buffer + (vec->size * vec->elem_size), e);
+	vec->seq.elem_tr->copy(vec->buffer + (vec->size * vec->elem_size), elem.ptr);
 	vec->size ++;
 	return ax_true;
 }
@@ -282,7 +288,7 @@ static void seq_sort(ax_any_t* any)
 }
 
 
-void seq_invert(ax_any_t* any)
+static void seq_invert(ax_any_t* any)
 {
 	BEGIN_TRAIT(any);
 	size_t left = 0, right = vec->size - 1;
@@ -294,13 +300,14 @@ void seq_invert(ax_any_t* any)
 		left++, right--;
 	}
 }
-ax_iter_t seq_find(ax_any_t* any, const void* val)
+static ax_iter_t seq_find(ax_any_t* any, /*const*/ ax_ref_t elem)
 {
 	BEGIN_TRAIT(any);
+	ax_ref_check(elem, vec->seq.elem_tr->type);
 	ax_iter_t it = { .owner = any, .tr = &iter_trait };
 	void* end = vec->buffer + (vec->size - 1) * vec->elem_size;
 	for (void* p = vec->buffer; p < end; p += vec->elem_size) {
-		if(vec->seq.elem_tr->equal(val, p)) {
+		if(vec->seq.elem_tr->equal(elem.ptr, p)) {
 			it.point = p;
 			return it;
 		}

@@ -64,7 +64,6 @@ const char* ax_type_name(char type);
 ax_stuff_trait_t* ax_any_stuff_trait();
 ax_bool_t ax_any_check_magic(const ax_any_t* any);
 
-
 static inline void      ax_any_free(ax_any_t *a) { a->tr->free(a); }
 static inline char      ax_any_type(ax_any_t *a) { return a->tr->type; }
 static inline ax_any_t* ax_any_move(ax_any_t *a) { return a->tr->move(a); }
@@ -79,9 +78,6 @@ static inline const char* ax_any_name(const ax_any_t *a) { return a->tr->name; }
 
 #ifdef AX_DEBUG
 void ax_assert_type(const ax_any_t* any, char type);
-# define AX_BEGIN_TRAIT(_any, _id, _type, _name)  ax_assert_type((_any), (_id)); _type _name = (_type)(_any);
-#else
-# define AX_BEGIN_TRAIT(_any, _id, _type, _name) _type _name = (_type)(_any);
 #endif
 
 #endif
