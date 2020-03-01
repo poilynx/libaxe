@@ -125,7 +125,7 @@ static const ax_iter_trait_t reverse_iter_trait = {
 static void any_free(ax_any_t* any)
 {
 	box_clear(any);
-	if(any->flags & AX_AF_RENTED)
+	if (!(any->flags & AX_AF_RENTED))
 		free(any);
 }
 
@@ -149,7 +149,7 @@ static ax_any_t* any_move(ax_any_t* any)
 	BEGIN_TRAIT(any);
 	ax_vector_t* old = vec;
 	ax_vector_t* new = NULL;
-	if(old->seq.box.any.flags & AX_AF_RENTED)
+	if (!(old->seq.box.any.flags & AX_AF_RENTED))
 		new = old;
 	else {
 		new = malloc(sizeof(ax_vector_t));
@@ -347,14 +347,15 @@ static const ax_seq_trait_t seq_trait = {
 
 ax_any_t* ax_vector_create(ax_vector_t* pt,const ax_stuff_trait_t* elem_tr)
 {
-	if (pt == NULL) {
+	if (pt == NULL)
 		pt = malloc(sizeof(ax_vector_t));
+	else
 		pt->seq.box.any.flags = AX_AF_RENTED;
-	}
+	
 	pt->seq.box.any.flags = 0;
 
 	ax_any_t* any = &pt->seq.box.any;
-	strcpy(any->magic, "AX");
+	ax_any_set_magic(any);
 	any->tr = &any_treat;
 
 	ax_box_t* box = &pt->seq.box;

@@ -26,12 +26,22 @@
 #include "debug.h"
 
 #define AX_T_ANY 0
-#define AX_T_BOX 1
-#define AX_T_MAP 2
-#define AX_T_SEQ 3
+#define AX_T_TUP 1
+#define AX_T_BOX 2
+#define AX_T_MAP 3
+#define AX_T_SEQ 4
+#define AX_T_STR 5
 
 struct ax_any_st;
 typedef struct ax_any_st ax_any_t;
+
+typedef ax_any_t *ax_pany;
+typedef ax_any_t *ax_ptuple;
+typedef ax_any_t *ax_pbox;
+typedef ax_any_t *ax_pmap;
+typedef ax_any_t *ax_pseq;
+typedef ax_any_t *ax_pstr;
+
 struct ax_stuff_trait_st;
 typedef struct ax_stuff_trait_st ax_stuff_trait_t;
 

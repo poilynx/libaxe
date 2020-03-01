@@ -44,8 +44,6 @@ struct ax_cref_st
 };
 typedef struct ax_cref_st ax_cref_t;
 
-
-
 #ifdef AX_DEBUG
 # define ax_cref_make(_p, _t) (struct ax_cref_st) { (_p), (_t) }
 # define ax_ref_make(_p, _t) (struct ax_ref_st) { (_p), (_t) }
@@ -54,7 +52,7 @@ typedef struct ax_cref_st ax_cref_t;
 # define ax_ref_check ax_cref_check
 #else
 # define ax_ref_make(_p, _t) (struct ax_ref_st) { (_p) }
-# define ax_cref_make(_p, _t) (struct ax_ref_st) { (_p) }
+# define ax_cref_make(_p, _t) (struct ax_cref_st) { (_p) }
 # define ax_ref_check(_r, _t) ((void)0)
 # define ax_cref_check(_r, _t) ((void)0)
 #endif
