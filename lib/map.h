@@ -28,21 +28,21 @@
 #include "debug.h"
 #include "pair.h"
 struct ax_stuff_trait_st;
-typedef struct ax_stuff_trait_st ax_stuff_trait_t;
+typedef struct ax_stuff_trait_st ax_stuff_trait;
 
 struct ax_map_st;
-typedef struct ax_map_st ax_map_t;
+typedef struct ax_map_st ax_map;
 
-typedef int      (*ax_map_put_f)(ax_any_t* any, ax_cref_t key, ax_cref_t value);
-typedef ax_iter_t(*ax_map_get_f)(ax_any_t* any, ax_cref_t key);
-typedef ax_bool_t(*ax_map_exist_f)(ax_any_t* any, ax_cref_t key);
-typedef ax_iter_t(*ax_map_find_f)(ax_any_t* any, ax_cref_t value);
-typedef ax_bool_t(*ax_map_erase_f)(ax_any_t* any, ax_cref_t key);
+typedef int      (*ax_map_put_f)(ax_any* any, ax_cref key, ax_cref value);
+typedef ax_iter(*ax_map_get_f)(ax_any* any, ax_cref key);
+typedef bool(*ax_map_exist_f)(ax_any* any, ax_cref key);
+typedef ax_iter(*ax_map_find_f)(ax_any* any, ax_cref value);
+typedef bool(*ax_map_erase_f)(ax_any* any, ax_cref key);
 
-typedef ax_cref_t (*ax_iter_pairkey_f)(ax_iter_t* it);
-typedef ax_ref_t  (*ax_iter_pairval_f)(ax_iter_t* it);
+typedef ax_cref (*ax_iter_pairkey_f)(ax_iter* it);
+typedef ax_ref  (*ax_iter_pairval_f)(ax_iter* it);
 
-struct ax_map_trait_st
+struct ax_maprait_st
 {
 	ax_map_put_f put;
 	ax_map_get_f get;
@@ -52,23 +52,23 @@ struct ax_map_trait_st
 	ax_iter_pairkey_f itkey;
 	ax_iter_pairval_f itval;
 };
-typedef struct ax_map_trait_st ax_map_trait_t;
+typedef struct ax_maprait_st ax_map_trait;
 
 struct ax_map_st
 {
-	ax_box_t box;
-	const ax_pair_t pair;
-	const ax_map_trait_t tr;
-	const ax_stuff_trait_t* elem_tr;
+	ax_box box;
+	const ax_pair pair;
+	const ax_map_trait tr;
+	const ax_stuff_trait* elem_tr;
 };
 
-int       ax_map_put  (ax_any_t* any, ax_ref_t key, ax_ref_t value);
-ax_iter_t ax_map_get  (ax_any_t* any, ax_ref_t key);
-ax_iter_t ax_map_find (ax_any_t* any, ax_ref_t value);
-ax_bool_t ax_map_exist(ax_any_t* any, ax_ref_t key);
-ax_bool_t ax_map_erase(ax_any_t* any);
-ax_cref_t ax_iter_pair_key(ax_iter_t* it);
-ax_ref_t  ax_iter_pair_val(ax_iter_t* it);
+int       ax_map_put  (ax_any* any, ax_ref key, ax_ref value);
+ax_iter ax_map_get  (ax_any* any, ax_ref key);
+ax_iter ax_map_find (ax_any* any, ax_ref value);
+bool ax_map_exist(ax_any* any, ax_ref key);
+bool ax_map_erase(ax_any* any);
+ax_cref ax_iter_pair_key(ax_iter* it);
+ax_ref  ax_iter_pair_val(ax_iter* it);
 
 #define ax_map_put  (_a, _k, _v) (ax_step(ax_map_put  ), ax_map_put  (_a, _k, _v))
 #define ax_map_get  (_a, _k)     (ax_step(ax_map_get  ), ax_map_get  (_a, _k))

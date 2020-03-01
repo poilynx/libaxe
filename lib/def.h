@@ -26,7 +26,6 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-typedef enum { ax_false, ax_true } ax_bool_t;
 typedef long double longd_t;
 
 struct ax_string_table_st {

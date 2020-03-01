@@ -1,3 +1,25 @@
+/*
+ * Copyright (c) 2020 Li hsilin <lihsilyn@gmail.com>
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
 #include "axe.h"
 #include "debug.h"
 #include <stdio.h>
@@ -5,7 +27,7 @@
 
 static int init_count = 0;
 
-void ax__init(ax_bool_t debug, ax_bool_t trace)
+void ax__init(bool debug, bool trace)
 {
 	if (init_count > 0) {
 		if(init_count > 0xFFFF) {
@@ -15,9 +37,9 @@ void ax__init(ax_bool_t debug, ax_bool_t trace)
 		return;
 	}
 #ifdef AX_DEBUG
-	ax_bool_t lib_debug = ax_true;
+	bool lib_debug = true;
 #else
-	ax_bool_t lib_debug = ax_false;
+	bool lib_debug = ax_false;
 #endif
 	if (lib_debug != debug) {
 		if (debug)
@@ -40,7 +62,7 @@ void ax__uninit()
 	} else if (init_count == 0)
 		return;
 	ax_debug_set_fd(NULL);
-	ax_debug_trace = ax_false;
+	ax_debug_trace = false;
 	init_count--;
 }
 

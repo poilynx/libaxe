@@ -30,12 +30,12 @@
 #define AX_LM_WARNING  1
 #define AX_LM_ERROR    2
 int  ax_debug_trace;
-void ax_debug_set_fd(FILE* fp);
-void ax_debug_pwhere();
-void ax_debug_step(const char* file, const char* caller, int line, const char* callee);
-void ax_debug_log(int level, const char*, ...);
-void ax_debug_abort();
-void ax_debug_assert_fail(const char* file, const char* func, int line, const char* brief, const char* fmt, ...);
+void ax_debug_set_fd (FILE* fp);
+void ax_debug_pwhere ();
+void ax_debug_step (const char* file, const char* caller, int line, const char* callee);
+void ax_debug_log (int level, const char*, ...);
+void ax_debug_abort ();
+void ax_debug_assert_fail (const char* file, const char* func, int line, const char* brief, const char* fmt, ...);
 
 #define ax_abort ax_debug_abort
 
@@ -64,8 +64,6 @@ void ax_debug_assert_fail(const char* file, const char* func, int line, const ch
 #else
 # define ax_step(__c) ((void)0)
 #endif
-
-/* --- For user --- */
 
 #undef ax_assert
 #ifdef AX_DEBUG

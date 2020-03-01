@@ -29,12 +29,12 @@
 #include <string.h>
 
 #define TYPE_ACCEPT(__t) { pos++; term[term_pos].type = (__t); break; }
-ax_vaf_t* ax_vaf_make(char *fmt)
+ax_vaf* ax_vaf_make(char *fmt)
 {
 	struct scan_term_st { char type; char mut; };
 	const int term_max = 8;
 
-	ax_vaf_t* vaf = malloc( sizeof(ax_vaf_t) + sizeof(ax_vaf_item_t) * 127);
+	ax_vaf* vaf = malloc( sizeof(ax_vaf) + sizeof(ax_vaf_item) * 127);
 	if(!vaf) return NULL;
 
 	int varg_count = 0, stuff_count = 0;
@@ -172,7 +172,7 @@ end_type_scan:
 	} /* end while */
 	vaf->magic = '+';
 	vaf->argc = stuff_count;
-	vaf = realloc(vaf, sizeof(ax_vaf_t) + sizeof(ax_vaf_item_t) * stuff_count);
+	vaf = realloc(vaf, sizeof(ax_vaf) + sizeof(ax_vaf_item) * stuff_count);
 	return vaf;
 too_many_arg:
 	free(vaf);
@@ -189,7 +189,7 @@ bad_char:
 	return NULL;
 }
 
-void ax_vail_push(ax_vail_t* vail, ax_vail_node_t* node)
+void ax_vail_push(ax_vail* vail, ax_vail_node* node)
 {
 	assert(vail);
 	node->next = NULL;
@@ -203,10 +203,10 @@ void ax_vail_push(ax_vail_t* vail, ax_vail_node_t* node)
 	vail->size ++;
 }
 
-ax_vail_node_t* ax_vail_pop(ax_vail_t* vail)
+ax_vail_node* ax_vail_pop(ax_vail* vail)
 {
 	assert(vail);
-	ax_vail_node_t* head = vail->head;
+	ax_vail_node* head = vail->head;
 	if(vail->head == NULL) {
 		return NULL;
 	} else {
@@ -216,19 +216,19 @@ ax_vail_node_t* ax_vail_pop(ax_vail_t* vail)
 	}
 }
 
-ax_vail_t* ax_vail_read(ax_vaf_t* vaf, ...)
+ax_vail* ax_vail_make(ax_vaf* vaf, ...)
 {
 	va_list va;
 	va_start(va, vaf);
 
-	ax_vail_t* vail = malloc(sizeof(ax_vail_t));
+	ax_vail* vail = malloc(sizeof(ax_vail));
 	vail->size = 0;
 	vail->capacity = 0;
 	vail->head = NULL;
 	vail->tail = NULL;
 
 	for (int node_i = 0 ; node_i < vaf->argc ; node_i++) {
-		ax_vail_node_t* node = malloc(sizeof(ax_vail_node_t));
+		ax_vail_node* node = malloc(sizeof(ax_vail_node));
 		if (vaf->table[node_i].mut) {
 			void* arr_ptr = va_arg(va, void*);
 			size_t arr_elems = va_arg(va, size_t);
@@ -270,8 +270,8 @@ ax_vail_t* ax_vail_read(ax_vaf_t* vaf, ...)
 	return vail;
 }
 
-void ax_vail_free(ax_vail_t* vail) {
-	ax_vail_node_t* p = ax_vail_pop(vail);
+void ax_vail_free(ax_vail* vail) {
+	ax_vail_node* p = ax_vail_pop(vail);
 	while (p) {
 		free(p);
 		p = ax_vail_pop(vail);
@@ -281,7 +281,7 @@ void ax_vail_free(ax_vail_t* vail) {
 
 #include <stdio.h>
 void test() {
-	ax_vaf_t* vaf = ax_vaf_make("llf_i8_&i8.sx3_i32");
+	ax_vaf* vaf = ax_vaf_make("llf_i8_&i8.sx3_i32");
 	printf("argc = %hhd\n", vaf->argc);
 	for(int i = 0; i< vaf->argc; i++) {
 		printf("%s %hhd\n", ax_stuff_name(vaf->table[i].type), vaf->table[i].mut);

@@ -26,36 +26,36 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-ax_bool_t ax_IS(const ax_any_t* any, char type)
+bool ax_IS(const ax_any* any, char type)
 {
 	switch(any->tr->type) {
 		case AX_T_ANY:
 			switch(type) {
 				case AX_T_ANY: break;
-				default: return ax_false;
+				default: return false;
 			}
 		case AX_T_BOX: 
 			switch(type) {
 				case AX_T_ANY:
 				case AX_T_BOX: break;
-				default: return ax_false;
+				default: return false;
 			}
 		case AX_T_MAP:
 			switch(type) {
 				case AX_T_ANY:
 				case AX_T_BOX:
 				case AX_T_MAP: break;
-				default: return ax_false;
+				default: return false;
 			}
 		case AX_T_SEQ:
 			switch(type) {
 				case AX_T_ANY:
 				case AX_T_BOX:
 				case AX_T_SEQ: break;
-				default: return ax_false;
+				default: return false;
 			}
 	}
-	return ax_true;
+	return true;
 
 }
 
@@ -70,19 +70,19 @@ const char* ax_type_name(char type)
 	}
 }
 
-static ax_bool_t stuff_equal(const void* e1, const void* e2)
+static bool stuff_equal(const void* e1, const void* e2)
 {
 	return (void*)e1 == (void*)e2;
 }
 
-static ax_bool_t stuff_less(const void* e1, const void* e2)
+static bool stuff_less(const void* e1, const void* e2)
 {
 	return(void*)e1 < (void*)e2;
 }
 
 static void stuff_free(const void* e)
 {
-	ax_any_t* any = (ax_any_t*)e;
+	ax_any* any = (ax_any*)e;
 	any->tr->free(any);
 }
 
@@ -100,11 +100,11 @@ static char* stuff_text(const void* e)
 
 static void stuff_copy(void* dst, const void* src)
 {
-	ax_any_t* anys = *(ax_any_t**)src;
+	ax_any* anys = *(ax_any**)src;
 	*(void**)dst = anys->tr->copy(src);
 }
 
-static ax_stuff_trait_t any_stuff_trait = {
+static ax_stuff_trait any_stuff_trait = {
 	.equal = stuff_equal,
 	.less = stuff_less,
 	.hash = stuff_hash,
@@ -113,7 +113,7 @@ static ax_stuff_trait_t any_stuff_trait = {
 	.text = stuff_text 
 };
 
-ax_stuff_trait_t* ax_any_stuff_trait()
+ax_stuff_trait* ax_any_stuff_trait()
 {
 	return &any_stuff_trait;
 }

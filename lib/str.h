@@ -25,15 +25,15 @@
 #include "seq.h"
 #include "debug.h"
 struct ax_str_st;
-typedef struct ax_str_st ax_str_t;
+typedef struct ax_str_st ax_str;
 
-typedef bool     (*ax_str_append_f)(ax_pstr this, ax_cref_t str);
-typedef size_t   (*ax_str_length_f)(ax_pstr this);
-typedef bool     (*ax_str_insert_f)(ax_pstr this, int start, ax_cref_t str);
-typedef ax_cref_t(*ax_str_cstr_f)  (ax_pstr this);
-typedef bool     (*ax_str_comp_f)  (ax_pstr this, const ax_pstr str);
-typedef ax_pstr  (*ax_str_substr_f)(ax_pstr this, int start, size_t len);
-typedef ax_pseq  (*ax_str_split_f) (ax_pstr this, ax_cref_t ch);
+typedef bool    (*ax_str_append_f) (ax_pstr this, ax_cref str);
+typedef size_t  (*ax_str_length_f) (ax_pstr this);
+typedef bool    (*ax_str_insert_f) (ax_pstr this, int start, ax_cref str);
+typedef ax_cref (*ax_str_cstr_f)   (ax_pstr this);
+typedef bool    (*ax_str_comp_f)   (ax_pstr this, const ax_pstr str);
+typedef ax_pstr (*ax_str_substr_f) (ax_pstr this, int start, size_t len);
+typedef ax_pseq (*ax_str_split_f)  (ax_pstr this, ax_cref ch);
 
 struct ax_str_trait_st
 {
@@ -46,12 +46,12 @@ struct ax_str_trait_st
 	ax_str_split_f  split;
 
 };
-typedef struct ax_str_trait_st ax_str_trait_t;
+typedef struct ax_str_trait_st ax_str_trait;
 
 struct ax_str_st
 {
-	ax_seq_t seq;
-	const ax_str_trait_t* tr;
+	ax_seq seq;
+	const ax_str_trait* tr;
 };
 
 #define ax_str_append(_a, _e)  (ax_step(ax_str_append), ax_str_append

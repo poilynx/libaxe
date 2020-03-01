@@ -28,84 +28,84 @@
 #include <stdlib.h>
 #include <stdio.h>
 #ifdef AX_DEBUG
-#define BEGIN_TRAIT(_a) ax_any_assert_type((_a), AX_T_SEQ); ax_vector_t* vec = (ax_vector_t*)any;
+#define BEGIN_TRAIT(_a) ax_any_assert_type((_a), AX_T_SEQ); ax_vector* vec = (ax_vector*)any;
 #else
-#define BEGIN_TRAIT(_a) ax_vector_t* vec = (ax_vector_t*)any;
+#define BEGIN_TRAIT(_a) ax_vector* vec = (ax_vector*)any;
 
 #endif
 
-static void box_clear(ax_any_t* any);
-static ax_bool_t seq_push(ax_any_t* any, ax_cref_t elem);
-static ax_bool_t seq_pop(ax_any_t* any);
-static ax_iter_t seq_find(ax_any_t* any, ax_cref_t elem);
-static void seq_sort(ax_any_t* any);
+static void    box_clear(ax_any* any);
+static bool    seq_push(ax_any* any, ax_cref elem);
+static bool    seq_pop(ax_any* any);
+static ax_iter seq_find(ax_any* any, ax_cref elem);
+static void    seq_sort(ax_any* any);
 
-static size_t box_size(ax_any_t* any);
-static size_t box_maxsize(ax_any_t* any);
-static ax_iter_t box_begin(ax_any_t* any);
-static ax_iter_t box_end(ax_any_t* any);
-static ax_iter_t box_rbegin(ax_any_t* any);
-static ax_iter_t box_rend(ax_any_t* any);
-static ax_iter_t box_erase(ax_any_t* any, ax_iter_t* it);
+static size_t  box_size(ax_any* any);
+static size_t  box_maxsize(ax_any* any);
+static ax_iter box_begin(ax_any* any);
+static ax_iter box_end(ax_any* any);
+static ax_iter box_rbegin(ax_any* any);
+static ax_iter box_rend(ax_any* any);
+static ax_iter box_erase(ax_any* any, ax_iter* it);
 
-static void any_free(ax_any_t* any);
-static void any_dump(const ax_any_t* any, int ind);
-static ax_any_t* any_copy(const ax_any_t* any);
-static ax_any_t* any_move(ax_any_t* any);
+static void    any_free(ax_any* any);
+static void    any_dump(const ax_any* any, int ind);
+static ax_any* any_copy(const ax_any* any);
+static ax_any* any_move(ax_any* any);
 
-static void iter_shift(ax_iter_t* it, int i);
-static ax_ref_t iter_get(const ax_iter_t* it, int i);
-static ax_bool_t iter_equal(const ax_iter_t* it1, const ax_iter_t* it2);
-static ax_bool_t iter_less(const ax_iter_t* it1, const ax_iter_t* it2);
-static size_t iter_dist(const ax_iter_t* it1, const ax_iter_t* it2);
+static void   iter_shift(ax_iter* it, int i);
+static ax_ref iter_get(const ax_iter* it, int i);
+static bool   iter_equal(const ax_iter* it1, const ax_iter* it2);
+static bool   iter_less(const ax_iter* it1, const ax_iter* it2);
+static size_t iter_dist(const ax_iter* it1, const ax_iter* it2);
 
-static inline void check_two_iterator(const ax_iter_t* it1, const ax_iter_t* it2)
+static inline void check_two_iterator(const ax_iter* it1, const ax_iter* it2)
 {
 	ax_panic_if(it1->owner != it2->owner, AX_LM_ERROR, "inconsistent owner of two iterator");
 	ax_panic_if(it1->tr != it2->tr, AX_LM_ERROR, "inconsistent direction of two iterator");
 }
 
-static void iter_shift(ax_iter_t* it, int i)
+static void iter_shift(ax_iter* it, int i)
 {
-	ax_vector_t* vec = it->owner;
+	ax_vector* vec = it->owner;
 	long off = (i * (vec->elem_size));
 	it->point += it->tr->norm ? + off : - off;
 }
 
-static ax_ref_t iter_get(const ax_iter_t* it, int i)
+static ax_ref iter_get(const ax_iter* it, int i)
 {
-	ax_vector_t* vec = it->owner;
-	ax_ref_t ref;
+	ax_vector* vec = it->owner;
+	ax_ref ref;
 	ref.d_type = vec->seq.elem_tr->type;
 	ref.ptr = it->point;
 	return ref;
 }
 
 
-static ax_bool_t iter_equal(const ax_iter_t* it1, const ax_iter_t* it2)
+static bool iter_equal(const ax_iter* it1, const ax_iter* it2)
 {
 	check_two_iterator(it1, it2);
 	return it1->point == it2->point;
 }
 
-static ax_bool_t iter_less(const ax_iter_t* it1, const ax_iter_t* it2)
+static bool iter_less(const ax_iter* it1, const ax_iter* it2)
 {
 	check_two_iterator(it1, it2);
 	return it1->tr->norm ? (it1->point < it2->point) : (it1->point > it2->point);
 }
 
-static size_t iter_dist(const ax_iter_t* it1, const ax_iter_t* it2)
+static size_t iter_dist(const ax_iter* it1, const ax_iter* it2)
 {
 	check_two_iterator(it1, it2);
-	ax_vector_t* vec = it1->owner;
+	ax_vector* vec = it1->owner;
 	size_t len = (it1->point > it2->point)
 		? it1->point - it2->point
 		: it2->point - it1->point;
 		return len / vec->elem_size;
 }
 
-static const ax_iter_trait_t iter_trait = {
-	.norm = ax_true,
+static const ax_iter_trait iter_trait = {
+	.norm = true,
 	.shift = iter_shift,
 	.get = iter_get,
 	.equal = iter_equal,
@@ -113,8 +113,8 @@ static const ax_iter_trait_t iter_trait = {
 	.dist = iter_dist,
 };
 
-static const ax_iter_trait_t reverse_iter_trait = {
-	.norm = ax_false,
+static const ax_iter_trait reverse_iter_trait = {
+	.norm = false,
 	.shift = iter_shift,
 	.get = iter_get,
 	.equal = iter_equal,
@@ -122,38 +122,38 @@ static const ax_iter_trait_t reverse_iter_trait = {
 	.dist = iter_dist,
 };
 
-static void any_free(ax_any_t* any)
+static void any_free(ax_any* any)
 {
 	box_clear(any);
 	if (!(any->flags & AX_AF_RENTED))
 		free(any);
 }
 
-static void any_dump(const ax_any_t* any, int ind)
+static void any_dump(const ax_any* any, int ind)
 {
 	printf("not implemented\n");
 }
 
-static ax_any_t* any_copy(const ax_any_t* any)
+static ax_any* any_copy(const ax_any* any)
 {
 	BEGIN_TRAIT(any);
-	ax_vector_t* new = malloc(sizeof(ax_vector_t));
-	memcpy(new, any, sizeof(ax_vector_t));
+	ax_vector* new = malloc(sizeof(ax_vector));
+	memcpy(new, any, sizeof(ax_vector));
 	new->buffer = malloc(vec->elem_size * vec->capacity);
 	memcpy(new->buffer, vec->buffer, vec->elem_size * vec->size);
-	return (ax_any_t*)new;
+	return (ax_any*)new;
 }
 
-static ax_any_t* any_move(ax_any_t* any)
+static ax_any* any_move(ax_any* any)
 {
 	BEGIN_TRAIT(any);
-	ax_vector_t* old = vec;
-	ax_vector_t* new = NULL;
+	ax_vector* old = vec;
+	ax_vector* new = NULL;
 	if (!(old->seq.box.any.flags & AX_AF_RENTED))
 		new = old;
 	else {
-		new = malloc(sizeof(ax_vector_t));
-		memcpy(new, old, sizeof(ax_vector_t));
+		new = malloc(sizeof(ax_vector));
+		memcpy(new, old, sizeof(ax_vector));
 		new->buffer = old->buffer;
 		memcpy(new->buffer, old->buffer, old->elem_size * old->size);
 		
@@ -161,35 +161,35 @@ static ax_any_t* any_move(ax_any_t* any)
 		old->buffer = NULL;
 		old->seq.box.any.flags |= AX_AF_FREED;
 	}
-	return (ax_any_t*)new;
+	return (ax_any*)new;
 
 }
 
-static size_t box_size(ax_any_t* any)
+static size_t box_size(ax_any* any)
 {
 	BEGIN_TRAIT(any);
 	return vec->size;
 }
 
-static size_t box_maxsize(ax_any_t* any)
+static size_t box_maxsize(ax_any* any)
 {
 	return 1028;
 }
 
-static ax_iter_t box_begin(ax_any_t* any)
+static ax_iter box_begin(ax_any* any)
 {
 	BEGIN_TRAIT(any);
-	ax_iter_t it;
+	ax_iter it;
 	it.owner = any;
 	it.point = vec->buffer;
 	it.tr = &iter_trait;
 	return it;
 }
 
-static ax_iter_t box_end(ax_any_t* any)
+static ax_iter box_end(ax_any* any)
 {
 	BEGIN_TRAIT(any);
-	ax_iter_t it;
+	ax_iter it;
 	it.owner = any;
 	it.point = vec->buffer + (vec->elem_size * vec->size);
 	it.tr = &iter_trait;
@@ -197,27 +197,27 @@ static ax_iter_t box_end(ax_any_t* any)
 	
 }
 
-static ax_iter_t box_rbegin(ax_any_t* any)
+static ax_iter box_rbegin(ax_any* any)
 {
 	BEGIN_TRAIT(any);
-	ax_iter_t it;
+	ax_iter it;
 	it.owner = any;
 	it.point = vec->buffer + (vec->size - 1) * vec->elem_size;
 	it.tr = &reverse_iter_trait;
 	return it;
 }
 
-static ax_iter_t box_rend(ax_any_t* any)
+static ax_iter box_rend(ax_any* any)
 {
 	BEGIN_TRAIT(any);
-	ax_iter_t it;
+	ax_iter it;
 	it.owner = any;
 	it.point = vec->buffer - vec->elem_size;
 	it.tr = &reverse_iter_trait;
 	return it;
 }
 
-static ax_iter_t box_erase(ax_any_t* any, ax_iter_t* it)
+static ax_iter box_erase(ax_any* any, ax_iter* it)
 {
 	BEGIN_TRAIT(any);
 	ax_panic_if(it->point < vec->buffer 
@@ -236,7 +236,7 @@ static ax_iter_t box_erase(ax_any_t* any, ax_iter_t* it)
 	return *it;
 }
 
-static void box_clear(ax_any_t* any)
+static void box_clear(ax_any* any)
 {
 	BEGIN_TRAIT(any);
 	void* end = vec->buffer + vec->size;
@@ -251,14 +251,14 @@ static void box_clear(ax_any_t* any)
 	}
 }
 
-static ax_bool_t seq_push(ax_any_t* any, ax_cref_t elem)
+static bool seq_push(ax_any* any, ax_cref elem)
 {
 	BEGIN_TRAIT(any);
 	ax_cref_check(elem, vec->seq.elem_tr->type);
 	if (vec->size + 1 >= vec->capacity) {
 		if(vec->capacity + 1 > vec->maxsize) {
 			ax_pwarning("has reached the maximum size of %hd", box_maxsize(any));
-			return ax_false;
+			return false;
 		}
 		vec->capacity += 100;
 		if(vec->capacity > vec->maxsize)
@@ -268,28 +268,28 @@ static ax_bool_t seq_push(ax_any_t* any, ax_cref_t elem)
 	}
 	vec->seq.elem_tr->copy(vec->buffer + (vec->size * vec->elem_size), elem.ptr);
 	vec->size ++;
-	return ax_true;
+	return true;
 }
 
-static ax_bool_t seq_pop(ax_any_t* any)
+static bool seq_pop(ax_any* any)
 {
 	BEGIN_TRAIT(any);
 	if (vec->size == 0)
 	{
 		ax_pinfo("nothing to pop");
-		return ax_false;
+		return false;
 	}
 	vec->size --;
-	return ax_true;
+	return true;
 }
 
-static void seq_sort(ax_any_t* any)
+static void seq_sort(ax_any* any)
 {
 	printf("not implemented\n");
 }
 
 
-static void seq_invert(ax_any_t* any)
+static void seq_invert(ax_any* any)
 {
 	BEGIN_TRAIT(any);
 	size_t left = 0, right = vec->size - 1;
@@ -301,11 +301,11 @@ static void seq_invert(ax_any_t* any)
 		left++, right--;
 	}
 }
-static ax_iter_t seq_find(ax_any_t* any, ax_cref_t elem)
+static ax_iter seq_find(ax_any* any, ax_cref elem)
 {
 	BEGIN_TRAIT(any);
 	ax_cref_check(elem, vec->seq.elem_tr->type);
-	ax_iter_t it = { .owner = any, .tr = &iter_trait };
+	ax_iter it = { .owner = any, .tr = &iter_trait };
 	void* end = vec->buffer + (vec->size - 1) * vec->elem_size;
 	for (void* p = vec->buffer; p < end; p += vec->elem_size) {
 		if(vec->seq.elem_tr->equal(elem.ptr, p)) {
@@ -317,7 +317,7 @@ static ax_iter_t seq_find(ax_any_t* any, ax_cref_t elem)
 	return it;
 }
 
-static const ax_any_trait_t any_treat = {
+static const ax_any_trait any_treat = {
 	.type = AX_T_SEQ,
 	.name = "any.box.seq:vector",
 	.free = any_free,
@@ -326,7 +326,7 @@ static const ax_any_trait_t any_treat = {
 	.move = any_move,
 };
 
-static const ax_box_trait_t box_trait = {
+static const ax_box_trait box_trait = {
 	.size = box_size,
 	.maxsize = box_maxsize,
 	.begin = box_begin,
@@ -337,7 +337,7 @@ static const ax_box_trait_t box_trait = {
 	.clear = box_clear
 };
 
-static const ax_seq_trait_t seq_trait = {
+static const ax_seq_trait seq_trait = {
 	.push = seq_push,
 	.pop = seq_pop,
 	.sort = seq_sort,
@@ -345,23 +345,23 @@ static const ax_seq_trait_t seq_trait = {
 	.invert = seq_invert
 };
 
-ax_any_t* ax_vector_create(ax_vector_t* pt,const ax_stuff_trait_t* elem_tr)
+ax_any* ax_vector_create(ax_vector* pt,const ax_stuff_trait* elem_tr)
 {
 	if (pt == NULL)
-		pt = malloc(sizeof(ax_vector_t));
+		pt = malloc(sizeof(ax_vector));
 	else
 		pt->seq.box.any.flags = AX_AF_RENTED;
 	
 	pt->seq.box.any.flags = 0;
 
-	ax_any_t* any = &pt->seq.box.any;
+	ax_any* any = &pt->seq.box.any;
 	ax_any_set_magic(any);
 	any->tr = &any_treat;
 
-	ax_box_t* box = &pt->seq.box;
+	ax_box* box = &pt->seq.box;
 	box->tr = &box_trait;
 
-	ax_seq_t* seq = &pt->seq;
+	ax_seq* seq = &pt->seq;
 	seq->tr = &seq_trait;
 	seq->elem_tr = elem_tr;
 
@@ -371,6 +371,6 @@ ax_any_t* ax_vector_create(ax_vector_t* pt,const ax_stuff_trait_t* elem_tr)
 	pt->size = 0;
 	pt->elem_size = elem_tr->size;
 
-	return (ax_any_t*)pt;
+	return (ax_any*)pt;
 }
 

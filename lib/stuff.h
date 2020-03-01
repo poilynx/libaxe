@@ -26,7 +26,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdarg.h>
-typedef uint8_t ax_stuff_type_t;
+typedef uint8_t ax_stuff_type;
 #define AX_ST_NIL   0
 #define AX_ST_RAW   1
 #define AX_ST_I8    2
@@ -63,13 +63,13 @@ union ax_stuff_u
 	void*    ptr;
 	void*    raw;
 };
-typedef union ax_stuff_u ax_stuff_t;
+typedef union ax_stuff_u ax_stuff;
 
-typedef void      (*ax_stuff_free_f)(const void* e);
-typedef size_t    (*ax_stuff_hash_f)(const void* e);
-typedef ax_bool_t (*ax_stuff_comp_f)(const void* e1, const void* e2);
-typedef void      (*ax_stuff_copy_f)(void* e1, const void* e2);
-typedef char*     (*ax_stuff_text_f)(const void* e);
+typedef void      (*ax_stuff_free_f) (const void* e);
+typedef size_t    (*ax_stuff_hash_f) (const void* e);
+typedef bool      (*ax_stuff_comp_f) (const void* e1, const void* e2);
+typedef void      (*ax_stuff_copy_f) (void* e1, const void* e2);
+typedef char*     (*ax_stuff_text_f) (const void* e);
 
 struct ax_stuff_trait_st
 {
@@ -83,12 +83,12 @@ struct ax_stuff_trait_st
 	ax_stuff_copy_f  move;
 	ax_stuff_text_f  text;
 };
-typedef struct ax_stuff_trait_st ax_stuff_trait_t;
+typedef struct ax_stuff_trait_st ax_stuff_trait;
 
-ax_stuff_type_t ax_stuff_pwl(char c);
-char*  ax_stuff_name (ax_stuff_type_t type);
-size_t ax_stuff_size (ax_stuff_type_t type);
-void   ax_stuff_set(char type, ax_stuff_t* stuff, va_list arg);
-const ax_stuff_trait_t* ax_stuff_trait(ax_stuff_type_t type);
+ax_stuff_type ax_stuff_pwl  (char c);
+char*         ax_stuff_name (ax_stuff_type type);
+size_t        ax_stuff_size (ax_stuff_type type);
+void          ax_stuff_set  (char type, ax_stuff* stuff, va_list arg);
+const         ax_stuff_trait* ax_stuff_traits(ax_stuff_type type);
 
 #endif

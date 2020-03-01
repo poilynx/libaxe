@@ -29,12 +29,12 @@
 #define AX_BT_SEQ 0
 #define AX_BT_MAP 1
 struct ax_box_st;
-typedef struct ax_box_st ax_box_t;
+typedef struct ax_box_st ax_box;
 
-typedef size_t   (*ax_box_size_f)(ax_any_t* any);
-typedef ax_iter_t(*ax_box_iter_f)(ax_any_t* any);
-typedef ax_iter_t(*ax_box_erase_f) (ax_any_t* any, ax_iter_t* iter);
-typedef void     (*ax_box_clear_f)(ax_any_t* any);
+typedef size_t   (*ax_box_size_f)(ax_any* any);
+typedef ax_iter(*ax_box_iter_f)(ax_any* any);
+typedef ax_iter(*ax_box_erase_f) (ax_any* any, ax_iter* iter);
+typedef void     (*ax_box_clear_f)(ax_any* any);
 
 
 struct ax_box_trait_st
@@ -50,21 +50,21 @@ struct ax_box_trait_st
 	ax_box_clear_f clear;
 	ax_box_erase_f erase;
 };
-typedef struct ax_box_trait_st ax_box_trait_t;
+typedef struct ax_box_trait_st ax_box_trait;
 
 struct ax_box_st
 {
-	ax_any_t any;
-	const ax_box_trait_t* tr;
+	ax_any any;
+	const ax_box_trait* tr;
 };
 
-static inline ax_iter_t ax_box_begin(ax_any_t* a) { return ((ax_box_t*)a)->tr->begin(a); }
-static inline ax_iter_t ax_box_end(ax_any_t* a) { return ((ax_box_t*)a)->tr->end(a); }
-static inline ax_iter_t ax_box_rbegin(ax_any_t* a) { return ((ax_box_t*)a)->tr->rbegin(a); }
-static inline ax_iter_t ax_box_rend(ax_any_t* a) { return ((ax_box_t*)a)->tr->rend(a); }
-static inline size_t    ax_box_size(ax_any_t* a) { return ((ax_box_t*)(a))->tr->size(a); }
-static inline void      ax_box_clear(ax_any_t* a) { ((ax_box_t*)(a))->tr->clear(a); }
-static inline ax_iter_t ax_box_erase(ax_any_t* a, ax_iter_t* it) { return ((ax_box_t*)(a))->tr->erase(a, it); }
+static inline ax_iter ax_box_begin (ax_any* a)  { return ((ax_box*)a)->tr->begin(a); }
+static inline ax_iter ax_box_end   (ax_any* a)  { return ((ax_box*)a)->tr->end(a); }
+static inline ax_iter ax_box_rbegin(ax_any* a)  { return ((ax_box*)a)->tr->rbegin(a); }
+static inline ax_iter ax_box_rend  (ax_any* a)  { return ((ax_box*)a)->tr->rend(a); }
+static inline size_t  ax_box_size  (ax_any* a)  { return ((ax_box*)(a))->tr->size(a); }
+static inline void    ax_box_clear (ax_any* a)  { ((ax_box*)(a))->tr->clear(a); }
+static inline ax_iter ax_box_erase (ax_any* a, ax_iter* it) { return ((ax_box*)(a))->tr->erase(a, it); }
 
 
 #define ax_box_begin(_a)      (ax_step(ax_box_begin), ax_box_begin((_a)))

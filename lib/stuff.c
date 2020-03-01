@@ -26,7 +26,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include <string.h>
-char* ax_stuff_name(ax_stuff_type_t type)
+char* ax_stuff_name(ax_stuff_type type)
 {
 	switch(type) {
 		case AX_ST_NIL:  return "nil";
@@ -50,7 +50,7 @@ char* ax_stuff_name(ax_stuff_type_t type)
 	}
 }
 
-size_t ax_stuff_size(ax_stuff_type_t type)
+size_t ax_stuff_size(ax_stuff_type type)
 {
 	switch(type) {
 		case AX_ST_NIL:  return 0;
@@ -76,7 +76,7 @@ size_t ax_stuff_size(ax_stuff_type_t type)
 }
 
 
-size_t ax_stuff_va_read(ax_stuff_type_t type, ax_stuff_t* stuff, va_list arg)
+size_t ax_stuff_va_read(ax_stuff_type type, ax_stuff* stuff, va_list arg)
 {
 	ax_assert(type<=AX_ST_RAW, "Unsupport type '%s'(%d)", ax_stuff_name(type), type);
 	va_list va;
@@ -120,7 +120,7 @@ size_t ax_stuff_va_read(ax_stuff_type_t type, ax_stuff_t* stuff, va_list arg)
 	return size;
 }
 
-ax_stuff_type_t ax_stuff_pwl(char c)
+ax_stuff_type ax_stuff_pwl(char c)
 {
 	return (c >= 'A' && c <= 'Z') ? c - 'A' + AX_ST_PWL : AX_ST_PTR;
 }
@@ -161,37 +161,37 @@ static void do_nothing() { }
 #define size_str sizeof(void*)
 #define size_ptr sizeof(unsigned char)
 
-static ax_bool_t equal_nil(const void* e1, const void* e2) { return ax_true; }
-static ax_bool_t equal_i8 (const void* e1, const void* e2) { return *(int8_t*) e1 == *(int8_t*) e2; }
-static ax_bool_t equal_i16(const void* e1, const void* e2) { return *(int16_t*)e1 == *(int16_t*)e2; }
-static ax_bool_t equal_i32(const void* e1, const void* e2) { return *(int32_t*)e1 == *(int32_t*)e2; }
-static ax_bool_t equal_i64(const void* e1, const void* e2) { return *(int64_t*)e1 == *(int64_t*)e2; }
-static ax_bool_t equal_u8 (const void* e1, const void* e2) { return *(int8_t*) e1 == *(int8_t*) e2; }
-static ax_bool_t equal_u16(const void* e1, const void* e2) { return *(int16_t*)e1 == *(int16_t*)e2; }
-static ax_bool_t equal_u32(const void* e1, const void* e2) { return *(int32_t*)e1 == *(int32_t*)e2; }
-static ax_bool_t equal_u64(const void* e1, const void* e2) { return *(int64_t*)e1 == *(int64_t*)e2; }
-static ax_bool_t equal_f  (const void* e1, const void* e2) { return *(float*)  e1 == *(float*)  e2; }
-static ax_bool_t equal_lf (const void* e1, const void* e2) { return *(double*) e1 == *(double*) e2; }
-static ax_bool_t equal_llf(const void* e1, const void* e2) { return *(long double*) e1 == *(long double*) e2; }
-static ax_bool_t equal_z  (const void* e1, const void* e2) { return *(size_t*) e1 == *(size_t*) e2; }
-static ax_bool_t equal_str(const void* e1, const void* e2) { return *(void**) e1 == *(void**) e2; }
-static ax_bool_t equal_ptr(const void* e1, const void* e2) { return (void*)    e1 == (void*)    e2; }
+static bool equal_nil(const void* e1, const void* e2) { return true; }
+static bool equal_i8 (const void* e1, const void* e2) { return *(int8_t*) e1 == *(int8_t*) e2; }
+static bool equal_i16(const void* e1, const void* e2) { return *(int16_t*)e1 == *(int16_t*)e2; }
+static bool equal_i32(const void* e1, const void* e2) { return *(int32_t*)e1 == *(int32_t*)e2; }
+static bool equal_i64(const void* e1, const void* e2) { return *(int64_t*)e1 == *(int64_t*)e2; }
+static bool equal_u8 (const void* e1, const void* e2) { return *(int8_t*) e1 == *(int8_t*) e2; }
+static bool equal_u16(const void* e1, const void* e2) { return *(int16_t*)e1 == *(int16_t*)e2; }
+static bool equal_u32(const void* e1, const void* e2) { return *(int32_t*)e1 == *(int32_t*)e2; }
+static bool equal_u64(const void* e1, const void* e2) { return *(int64_t*)e1 == *(int64_t*)e2; }
+static bool equal_f  (const void* e1, const void* e2) { return *(float*)  e1 == *(float*)  e2; }
+static bool equal_lf (const void* e1, const void* e2) { return *(double*) e1 == *(double*) e2; }
+static bool equal_llf(const void* e1, const void* e2) { return *(long double*) e1 == *(long double*) e2; }
+static bool equal_z  (const void* e1, const void* e2) { return *(size_t*) e1 == *(size_t*) e2; }
+static bool equal_str(const void* e1, const void* e2) { return *(void**) e1 == *(void**) e2; }
+static bool equal_ptr(const void* e1, const void* e2) { return (void*)    e1 == (void*)    e2; }
 
-static ax_bool_t less_nil(const void* e1, const void* e2) { return ax_false; }
-static ax_bool_t less_i8 (const void* e1, const void* e2) { return *(int8_t*) e1 < *(int8_t*) e2; }
-static ax_bool_t less_i16(const void* e1, const void* e2) { return *(int16_t*)e1 < *(int16_t*)e2; }
-static ax_bool_t less_i32(const void* e1, const void* e2) { return *(int32_t*)e1 < *(int32_t*)e2; }
-static ax_bool_t less_i64(const void* e1, const void* e2) { return *(int64_t*)e1 < *(int64_t*)e2; }
-static ax_bool_t less_u8 (const void* e1, const void* e2) { return *(int8_t*) e1 < *(int8_t*) e2; }
-static ax_bool_t less_u16(const void* e1, const void* e2) { return *(int16_t*)e1 < *(int16_t*)e2; }
-static ax_bool_t less_u32(const void* e1, const void* e2) { return *(int32_t*)e1 < *(int32_t*)e2; }
-static ax_bool_t less_u64(const void* e1, const void* e2) { return *(int64_t*)e1 < *(int64_t*)e2; }
-static ax_bool_t less_f  (const void* e1, const void* e2) { return *(float*)  e1 < *(float*)  e2; }
-static ax_bool_t less_lf (const void* e1, const void* e2) { return *(double*) e1 < *(double*) e2; }
-static ax_bool_t less_llf(const void* e1, const void* e2) { return *(long double*) e1 == *(long double*) e2; }
-static ax_bool_t less_z  (const void* e1, const void* e2) { return *(size_t*) e1 < *(size_t*) e2; }
-static ax_bool_t less_str(const void* e1, const void* e2) { return strcmp(*(char**)e1, *(char**)e2) < 0; }
-static ax_bool_t less_ptr(const void* e1, const void* e2) { return *(void**)    e1 < *(void**)    e2; }
+static bool less_nil(const void* e1, const void* e2) { return true; }
+static bool less_i8 (const void* e1, const void* e2) { return *(int8_t*) e1 < *(int8_t*) e2; }
+static bool less_i16(const void* e1, const void* e2) { return *(int16_t*)e1 < *(int16_t*)e2; }
+static bool less_i32(const void* e1, const void* e2) { return *(int32_t*)e1 < *(int32_t*)e2; }
+static bool less_i64(const void* e1, const void* e2) { return *(int64_t*)e1 < *(int64_t*)e2; }
+static bool less_u8 (const void* e1, const void* e2) { return *(int8_t*) e1 < *(int8_t*) e2; }
+static bool less_u16(const void* e1, const void* e2) { return *(int16_t*)e1 < *(int16_t*)e2; }
+static bool less_u32(const void* e1, const void* e2) { return *(int32_t*)e1 < *(int32_t*)e2; }
+static bool less_u64(const void* e1, const void* e2) { return *(int64_t*)e1 < *(int64_t*)e2; }
+static bool less_f  (const void* e1, const void* e2) { return *(float*)  e1 < *(float*)  e2; }
+static bool less_lf (const void* e1, const void* e2) { return *(double*) e1 < *(double*) e2; }
+static bool less_llf(const void* e1, const void* e2) { return *(long double*) e1 == *(long double*) e2; }
+static bool less_z  (const void* e1, const void* e2) { return *(size_t*) e1 < *(size_t*) e2; }
+static bool less_str(const void* e1, const void* e2) { return strcmp(*(char**)e1, *(char**)e2) < 0; }
+static bool less_ptr(const void* e1, const void* e2) { return *(void**)    e1 < *(void**)    e2; }
 
 static size_t hash_nil(const void* e) { return 0; }
 static size_t hash_i8 (const void* e) { return (size_t)*(uint8_t*)e; }
@@ -276,7 +276,7 @@ static void move_ptr(void* e1, const void* e2) { *(void**)e1 = *(void**)e2; *(ch
 /* -- Define trait structure -- */
 
 #define DECLARE_TRAIT_STRUCT(_t) \
-	static const ax_stuff_trait_t trait_##_t = { \
+	static const ax_stuff_trait trait_##_t = { \
 		.type = type_##_t, \
 		.size = size_##_t, \
 		.equal = equal_##_t, \
@@ -305,7 +305,7 @@ DECLARE_TRAIT_STRUCT(str)
 DECLARE_TRAIT_STRUCT(ptr)
 
 /* -- Define functions that get trait structure pointer -- */
-const ax_stuff_trait_t* ax_stuff_trait(ax_stuff_type_t type)
+const ax_stuff_trait* ax_stuff_traits(ax_stuff_type type)
 {
 	switch(type) {
 		case AX_ST_NIL:  return &trait_nil;

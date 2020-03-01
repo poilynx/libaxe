@@ -31,32 +31,31 @@ struct ax_vaf_item_st
 	char type;
 	char mut;
 };
-typedef struct ax_vaf_item_st ax_vaf_item_t;
+typedef struct ax_vaf_item_st ax_vaf_item;
 
 struct ax_vaf_st
 {
 	char magic;
 	char argc;
-	ax_vaf_item_t table[0];
+	ax_vaf_item table[0];
 };
-typedef struct ax_vaf_st ax_vaf_t;
+typedef struct ax_vaf_st ax_vaf;
 
 struct ax_vail_node_st
 {
 	char mut;
 	char type;
-	ax_stuff_t value;
+	ax_stuff value;
 	size_t size;
 	struct ax_vail_node_st* next;
 };
-typedef struct ax_vail_node_st ax_vail_node_t;
+typedef struct ax_vail_node_st ax_vail_node;
 
 #define ax_vail_node_set(p, m, t, v, s) \
 	((p)->mut = (m), \
 	(p)->type = (t), \
 	(p)->value = (v), \
 	(p)->size = (s)) 
-
 
 struct ax_vail_st
 {
@@ -65,11 +64,12 @@ struct ax_vail_st
 	struct ax_vail_node_st* head;
 	struct ax_vail_node_st* tail;
 };
-typedef struct ax_vail_st ax_vail_t;
+typedef struct ax_vail_st ax_vail;
 
-ax_vaf_t* ax_vaf_make(char *fmt);
-void ax_vail_push(ax_vail_t* vail, ax_vail_node_t* node);
-ax_vail_node_t* ax_vail_pop(ax_vail_t* vail);
-ax_vail_t* ax_vail_read(ax_vaf_t* vaf, ...);
+ax_vaf*       ax_vaf_make  (char *fmt);
+void          ax_vail_push (ax_vail* vail, ax_vail_node* node);
+ax_vail_node* ax_vail_pop  (ax_vail* vail);
+ax_vail*      ax_vail_make (ax_vaf* vaf, ...);
+void          ax_vail_free (ax_vail* vail);
 
 #endif
