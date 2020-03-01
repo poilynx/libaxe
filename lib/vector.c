@@ -35,8 +35,9 @@
 #endif
 
 static void box_clear(ax_any_t* any);
-static ax_bool_t seq_push(ax_any_t* any, ax_ref_t elem);
+static ax_bool_t seq_push(ax_any_t* any, ax_cref_t elem);
 static ax_bool_t seq_pop(ax_any_t* any);
+static ax_iter_t seq_find(ax_any_t* any, ax_cref_t elem);
 static void seq_sort(ax_any_t* any);
 
 static size_t box_size(ax_any_t* any);
@@ -250,10 +251,10 @@ static void box_clear(ax_any_t* any)
 	}
 }
 
-static ax_bool_t seq_push(ax_any_t* any, ax_ref_t elem)
+static ax_bool_t seq_push(ax_any_t* any, ax_cref_t elem)
 {
 	BEGIN_TRAIT(any);
-	ax_ref_check(elem, vec->seq.elem_tr->type);
+	ax_cref_check(elem, vec->seq.elem_tr->type);
 	if (vec->size + 1 >= vec->capacity) {
 		if(vec->capacity + 1 > vec->maxsize) {
 			ax_pwarning("has reached the maximum size of %hd", box_maxsize(any));
@@ -300,10 +301,10 @@ static void seq_invert(ax_any_t* any)
 		left++, right--;
 	}
 }
-static ax_iter_t seq_find(ax_any_t* any, /*const*/ ax_ref_t elem)
+static ax_iter_t seq_find(ax_any_t* any, ax_cref_t elem)
 {
 	BEGIN_TRAIT(any);
-	ax_ref_check(elem, vec->seq.elem_tr->type);
+	ax_cref_check(elem, vec->seq.elem_tr->type);
 	ax_iter_t it = { .owner = any, .tr = &iter_trait };
 	void* end = vec->buffer + (vec->size - 1) * vec->elem_size;
 	for (void* p = vec->buffer; p < end; p += vec->elem_size) {
