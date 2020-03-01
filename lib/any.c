@@ -70,25 +70,6 @@ const char* ax_type_name(char type)
 	}
 }
 
-ax_bool_t ax_any_check_magic(const ax_any_t* any)
-{
-	return any->magic[0] == 'A' && any->magic[1] == 'X' && any->magic[2] == '\0';
-}
-
-#ifdef AX_DEBUG
-void ax_assert_type(const ax_any_t* any, char type)
-{
-	if (ax_any_check_magic(any) == ax_false) {
-		ax_perror("Invalid !any pointer");
-		ax_abort();
-	}
-	if (ax_IS(any, type) == ax_false) {
-		ax_perror("Not a %s, but %s", ax_type_name(type), ax_any_name(any));
-		ax_abort();
-	}
-}
-#endif
-
 static ax_bool_t stuff_equal(const void* e1, const void* e2)
 {
 	return (void*)e1 == (void*)e2;
