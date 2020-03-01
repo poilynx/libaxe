@@ -41,9 +41,9 @@ char* ax_stuff_name(ax_stuff_type_t type)
 		case AX_ST_Z:    return "size_t";
 		case AX_ST_F:    return "float";
 		case AX_ST_LF:   return "double";
-		case AX_ST_LLF:  return "long_double";
+		case AX_ST_LLF:  return "longdouble";
 		case AX_ST_STR:  return "char[]";
-		case AX_ST_RAW:  return "raw_data";
+		case AX_ST_RAW:  return "uchar[]";
 		case AX_ST_PTR: 
 		case AX_ST_PWL:
 		default:         return "void*";
@@ -70,7 +70,7 @@ size_t ax_stuff_size(ax_stuff_type_t type)
 		case AX_ST_PTR:  return sizeof(void*);
 		case AX_ST_RAW:  return sizeof(unsigned char);
 	}
-	ax_perror("Unrecognized type %d", type);
+	ax_perror(ax_strtab.unrecognized_type_d, type);
 	ax_abort();
 	return 0;
 }

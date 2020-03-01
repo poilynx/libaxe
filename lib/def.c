@@ -25,5 +25,6 @@
 const struct ax_string_table_st ax_strtab = {
 	.unknow = "Unknow",
 	.uncompatable_type = "Uncompatable type",
+	.unrecognized_type_d = "Unrecognized type %d"
 };
 

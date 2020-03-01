@@ -24,22 +24,32 @@
 #define PAIR_H_
 #include "stuff.h"
 #include "ref.h"
-struct ax_pair_st {};
+struct ax_pair_st {
+	ax_cref_t key;
+	ax_ref_t value;
+};
 typedef struct ax_pair_st ax_pair_t;
 
-typedef ax_ref_t(*ax_pair_field_f)(ax_pair_t* pair);
-struct ax_pair_trait_st
+inline static ax_pair_t*
+ax_rget_pair(ax_ref_t r)
 {
-	ax_pair_field_f key;
-	ax_pair_field_f value;
-};
-typedef struct ax_pair_trait_st ax_pair_trait_t;
+	ax_ref_check(r, ax_stuff_pwl('P'));
+	return r.ptr;
+}
 
-
-inline static ax_pair_t* ax_rget_pair(ax_ref_t r) { ax_ref_check(r, ax_stuff_pwl('P')); return r.ptr; }
-inline static ax_ref_t ax_rset_pair(ax_pair_t*  p) { return ax_ref_make(p, ax_stuff_pwl('P')); }
+inline static ax_ref_t
+ax_rset_pair(ax_pair_t* p)
+{
+	return ax_ref_make(p, ax_stuff_pwl('P'));
+}
 
 #define ax_rget_pair(_r)  (ax_step(ax_rset_pair), ax_rget_pair((_r)))
 #define ax_rset_pair(_p) (ax_step(ax_rset_pair), ax_rset_pair((_p))) 
+
+#ifdef AX_DEBUG
+#define ax_pair_make(_k, _kt, _v, _vt) ((ax_pair_t) { (ax_cref_t) { (_k), (_kt) }, (ax_ref_t) { (_v), (_vt) } })
+#else
+#define ax_pair_make(_k, _kt, _v, _vt) ((ax_pair_t) { (ax_cref_t) { (_k) }, (ax_ref_t) { (_v) } })
+#endif
 
 #endif

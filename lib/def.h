@@ -31,6 +31,7 @@ typedef long double longd_t;
 struct ax_string_table_st {
 	char* unknow;
 	char* uncompatable_type;
+	char* unrecognized_type_d;
 };
 
 const struct ax_string_table_st ax_strtab;

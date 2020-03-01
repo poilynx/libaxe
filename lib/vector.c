@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #ifdef AX_DEBUG
-#define BEGIN_TRAIT(_a) ax_assert_type((_a), AX_T_SEQ); ax_vector_t* vec = (ax_vector_t*)any;
+#define BEGIN_TRAIT(_a) ax_any_assert_type((_a), AX_T_SEQ); ax_vector_t* vec = (ax_vector_t*)any;
 #else
 #define BEGIN_TRAIT(_a) ax_vector_t* vec = (ax_vector_t*)any;
 
@@ -124,7 +124,7 @@ static const ax_iter_trait_t reverse_iter_trait = {
 static void any_free(ax_any_t* any)
 {
 	box_clear(any);
-	if(any->flags & AX_AF_NEED_FREE)
+	if(any->flags & AX_AF_RENTED)
 		free(any);
 }
 
@@ -148,7 +148,7 @@ static ax_any_t* any_move(ax_any_t* any)
 	BEGIN_TRAIT(any);
 	ax_vector_t* old = vec;
 	ax_vector_t* new = NULL;
-	if(old->seq.box.any.flags & AX_AF_NEED_FREE)
+	if(old->seq.box.any.flags & AX_AF_RENTED)
 		new = old;
 	else {
 		new = malloc(sizeof(ax_vector_t));
@@ -348,7 +348,7 @@ ax_any_t* ax_vector_create(ax_vector_t* pt,const ax_stuff_trait_t* elem_tr)
 {
 	if (pt == NULL) {
 		pt = malloc(sizeof(ax_vector_t));
-		pt->seq.box.any.flags = AX_AF_NEED_FREE;
+		pt->seq.box.any.flags = AX_AF_RENTED;
 	}
 	pt->seq.box.any.flags = 0;
 
