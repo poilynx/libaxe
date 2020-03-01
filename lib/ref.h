@@ -69,7 +69,6 @@ inline static uint64_t* ax_rget_u64 (ax_ref r) { ax_ref_check(r, AX_ST_U64); ret
 inline static size_t*   ax_rget_z   (ax_ref r) { ax_ref_check(r, AX_ST_Z  ); return (size_t*)r.ptr; }
 inline static float*    ax_rget_f   (ax_ref r) { ax_ref_check(r, AX_ST_F  ); return (float*)r.ptr; }
 inline static double*   ax_rget_lf  (ax_ref r) { ax_ref_check(r, AX_ST_LF ); return (double*)r.ptr; }
-inline static longd_t*  ax_rget_llf (ax_ref r) { ax_ref_check(r, AX_ST_LLF); return (longd_t*)r.ptr; }
 inline static char*     ax_rget_str (ax_ref r) { ax_ref_check(r, AX_ST_STR); return (char*)r.ptr; }
 inline static void**    ax_rget_ptr (ax_ref r) { ax_ref_check(r, AX_ST_PTR); return (void**)r.ptr; }
 inline static void*     ax_rget_raw (ax_ref r) { ax_ref_check(r, AX_ST_RAW); return r.ptr; }
@@ -87,7 +86,6 @@ inline static const uint64_t* ax_crget_u64 (ax_cref r) { ax_cref_check(r, AX_ST_
 inline static const size_t*   ax_crget_z   (ax_cref r) { ax_cref_check(r, AX_ST_Z  ); return (const size_t*)r.ptr; }
 inline static const float*    ax_crget_f   (ax_cref r) { ax_cref_check(r, AX_ST_F  ); return (const float*)r.ptr; }
 inline static const double*   ax_crget_lf  (ax_cref r) { ax_cref_check(r, AX_ST_LF ); return (const double*)r.ptr; }
-inline static const longd_t*  ax_crget_llf (ax_cref r) { ax_cref_check(r, AX_ST_LLF); return (const longd_t*)r.ptr; }
 inline static const char*     ax_crget_str (ax_cref r) { ax_cref_check(r, AX_ST_STR); return (const char*)r.ptr; }
 inline static const void**    ax_crget_ptr (ax_cref r) { ax_cref_check(r, AX_ST_PTR); return (const void**)r.ptr; }
 inline static const void*     ax_crget_raw (ax_cref r) { ax_cref_check(r, AX_ST_RAW); return r.ptr; }
@@ -105,7 +103,6 @@ inline static ax_ref ax_rset_u64 (uint64_t* p) { return ax_ref_make(p, AX_ST_U64
 inline static ax_ref ax_rset_z   (size_t*   p) { return ax_ref_make(p, AX_ST_Z  ); }
 inline static ax_ref ax_rset_f   (float*    p) { return ax_ref_make(p, AX_ST_F  ); }
 inline static ax_ref ax_rset_lf  (double*   p) { return ax_ref_make(p, AX_ST_LF ); }
-inline static ax_ref ax_rset_llf (longd_t*  p) { return ax_ref_make(p, AX_ST_LLF); }
 inline static ax_ref ax_rset_str (char*     p) { return ax_ref_make(p, AX_ST_STR); }
 inline static ax_ref ax_rset_ptr (void**    p) { return ax_ref_make(p, AX_ST_PTR); }
 inline static ax_ref ax_rset_raw (void*     p) { return ax_ref_make(p, AX_ST_RAW); }
@@ -124,7 +121,6 @@ inline static ax_cref ax_crset_u64 (const uint64_t* p) { return ax_cref_make(p, 
 inline static ax_cref ax_crset_z   (const size_t*   p) { return ax_cref_make(p, AX_ST_Z  ); }
 inline static ax_cref ax_crset_f   (const float*    p) { return ax_cref_make(p, AX_ST_F  ); }
 inline static ax_cref ax_crset_lf  (const double*   p) { return ax_cref_make(p, AX_ST_LF ); }
-inline static ax_cref ax_crset_llf (const longd_t*  p) { return ax_cref_make(p, AX_ST_LLF); }
 inline static ax_cref ax_crset_str (const char*     p) { return ax_cref_make(p, AX_ST_STR); }
 inline static ax_cref ax_crset_ptr (const void**    p) { return ax_cref_make(p, AX_ST_PTR); }
 inline static ax_cref ax_crset_raw (const void*     p) { return ax_cref_make(p, AX_ST_RAW); }
@@ -143,7 +139,6 @@ inline static ax_cref ax_crset_pwl (const void*     p, char l) { return ax_cref_
 #define ax_rget_z  (_r) (ax_step(ax_rget_z  ), ax_rget_z  ((_r)))
 #define ax_rget_f  (_r) (ax_step(ax_rget_f  ), ax_rget_f  ((_r)))
 #define ax_rget_lf (_r) (ax_step(ax_rget_lf ), ax_rget_lf ((_r)))
-#define ax_rget_llf(_r) (ax_step(ax_rget_llf), ax_rget_llf((_r)))
 #define ax_rget_str(_r) (ax_step(ax_rget_str), ax_rget_str((_r)))
 #define ax_rget_ptr(_r) (ax_step(ax_rget_ptr), ax_rget_ptr((_r)))
 
@@ -161,7 +156,6 @@ inline static ax_cref ax_crset_pwl (const void*     p, char l) { return ax_cref_
 #define ax_crget_z  (_r) (ax_step(ax_crget_z  ), ax_crget_z  ((_r)))
 #define ax_crget_f  (_r) (ax_step(ax_crget_f  ), ax_crget_f  ((_r)))
 #define ax_crget_lf (_r) (ax_step(ax_crget_lf ), ax_crget_lf ((_r)))
-#define ax_crget_llf(_r) (ax_step(ax_crget_llf), ax_crget_llf((_r)))
 #define ax_crget_str(_r) (ax_step(ax_crget_str), ax_crget_str((_r)))
 #define ax_crget_ptr(_r) (ax_step(ax_crget_ptr), ax_crget_ptr((_r)))
 #endif

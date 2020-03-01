@@ -26,6 +26,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 #include <string.h>
+
 char* ax_stuff_name(ax_stuff_type type)
 {
 	switch(type) {
@@ -41,7 +42,6 @@ char* ax_stuff_name(ax_stuff_type type)
 		case AX_ST_Z:    return "size_t";
 		case AX_ST_F:    return "float";
 		case AX_ST_LF:   return "double";
-		case AX_ST_LLF:  return "longdouble";
 		case AX_ST_STR:  return "char[]";
 		case AX_ST_RAW:  return "uchar[]";
 		case AX_ST_PTR: 
@@ -65,7 +65,6 @@ size_t ax_stuff_size(ax_stuff_type type)
 		case AX_ST_Z:    return sizeof(size_t);
 		case AX_ST_F:    return sizeof(float);
 		case AX_ST_LF:   return sizeof(double);
-		case AX_ST_LLF:  return sizeof(long double);
 		case AX_ST_STR:
 		case AX_ST_PTR:  return sizeof(void*);
 		case AX_ST_RAW:  return sizeof(unsigned char);
@@ -74,7 +73,6 @@ size_t ax_stuff_size(ax_stuff_type type)
 	ax_abort();
 	return 0;
 }
-
 
 size_t ax_stuff_va_read(ax_stuff_type type, ax_stuff* stuff, va_list arg)
 {
@@ -95,7 +93,6 @@ size_t ax_stuff_va_read(ax_stuff_type type, ax_stuff* stuff, va_list arg)
 		case AX_ST_Z:   stuff->z   = (float)va_arg(va, size_t); break;
 		case AX_ST_F:   stuff->f   = (float)va_arg(va, double); break;
 		case AX_ST_LF:  stuff->lf  = va_arg(va, double); break;
-		case AX_ST_LLF: stuff->llf = va_arg(va, long double); break;
 		case AX_ST_RAW:
 		{
 			void* p = va_arg(va, void*);
@@ -124,8 +121,6 @@ ax_stuff_type ax_stuff_pwl(char c)
 {
 	return (c >= 'A' && c <= 'Z') ? c - 'A' + AX_ST_PWL : AX_ST_PTR;
 }
-	
-
 
 static void do_nothing() { }
 
@@ -138,10 +133,9 @@ static void do_nothing() { }
 #define type_u16 AX_ST_U16
 #define type_u32 AX_ST_U32
 #define type_u64 AX_ST_U64
-#define type_f   AX_ST_Z
-#define type_lf  AX_ST_F
-#define type_llf AX_ST_LF
-#define type_z   AX_ST_LLF
+#define type_f   AX_ST_F
+#define type_lf  AX_ST_LF
+#define type_z   AX_ST_Z
 #define type_str AX_ST_STR
 #define type_ptr AX_ST_PTR
 
@@ -156,7 +150,6 @@ static void do_nothing() { }
 #define size_u64 sizeof(size_t)
 #define size_f   sizeof(float)
 #define size_lf  sizeof(double)
-#define size_llf sizeof(long double)
 #define size_z   sizeof(size_t)
 #define size_str sizeof(void*)
 #define size_ptr sizeof(unsigned char)
@@ -172,7 +165,6 @@ static bool equal_u32(const void* e1, const void* e2) { return *(int32_t*)e1 == 
 static bool equal_u64(const void* e1, const void* e2) { return *(int64_t*)e1 == *(int64_t*)e2; }
 static bool equal_f  (const void* e1, const void* e2) { return *(float*)  e1 == *(float*)  e2; }
 static bool equal_lf (const void* e1, const void* e2) { return *(double*) e1 == *(double*) e2; }
-static bool equal_llf(const void* e1, const void* e2) { return *(long double*) e1 == *(long double*) e2; }
 static bool equal_z  (const void* e1, const void* e2) { return *(size_t*) e1 == *(size_t*) e2; }
 static bool equal_str(const void* e1, const void* e2) { return *(void**) e1 == *(void**) e2; }
 static bool equal_ptr(const void* e1, const void* e2) { return (void*)    e1 == (void*)    e2; }
@@ -188,7 +180,6 @@ static bool less_u32(const void* e1, const void* e2) { return *(int32_t*)e1 < *(
 static bool less_u64(const void* e1, const void* e2) { return *(int64_t*)e1 < *(int64_t*)e2; }
 static bool less_f  (const void* e1, const void* e2) { return *(float*)  e1 < *(float*)  e2; }
 static bool less_lf (const void* e1, const void* e2) { return *(double*) e1 < *(double*) e2; }
-static bool less_llf(const void* e1, const void* e2) { return *(long double*) e1 == *(long double*) e2; }
 static bool less_z  (const void* e1, const void* e2) { return *(size_t*) e1 < *(size_t*) e2; }
 static bool less_str(const void* e1, const void* e2) { return strcmp(*(char**)e1, *(char**)e2) < 0; }
 static bool less_ptr(const void* e1, const void* e2) { return *(void**)    e1 < *(void**)    e2; }
@@ -204,9 +195,8 @@ static size_t hash_u32(const void* e) { return (size_t)*(uint32_t*)e; }
 static size_t hash_u64(const void* e) { return (size_t)*(uint64_t*)e; }
 static size_t hash_f  (const void* e) { return (size_t)*(uint32_t*)e; }
 static size_t hash_lf (const void* e) { return (size_t)*(uint64_t*)e; }
-static size_t hash_llf(const void* e) { return (size_t)*(long double*)e; }
 static size_t hash_z  (const void* e) { return *(size_t*)e; }
-static size_t hash_str(const void* e) { return 0; } //TODO
+static size_t hash_str(const void* e) { return 0; } //TODO calculate hash of string
 static size_t hash_ptr(const void* e) { return (size_t)*(void**)e; }
 
 #define free_nil do_nothing
@@ -220,7 +210,6 @@ static size_t hash_ptr(const void* e) { return (size_t)*(void**)e; }
 #define free_u64 do_nothing
 #define free_f   do_nothing
 #define free_lf  do_nothing
-#define free_llf do_nothing
 #define free_z   do_nothing
 static void free_str(const void* e) { free(*(char**)e); }
 static void free_ptr(const void* e) { free(*(void**)e); }
@@ -236,7 +225,6 @@ static char* text_u32(const void* e) { return ""; }
 static char* text_u64(const void* e) { return ""; }
 static char* text_f  (const void* e) { return ""; }
 static char* text_lf (const void* e) { return ""; }
-static char* text_llf(const void* e) { return ""; }
 static char* text_z  (const void* e) { return ""; }
 static char* text_str(const void* e) { return ""; }
 static char* text_ptr(const void* e) { return ""; }
@@ -252,7 +240,6 @@ static void copy_i64(void* e1, const void* e2) { *(int64_t*)e1 = *(int64_t*)e2; 
 #define copy_u64 copy_i64
 static void copy_f  (void* e1, const void* e2) { *(float*)  e1 = *(float*)  e2; }
 static void copy_lf (void* e1, const void* e2) { *(double*) e1 = *(double*) e2; }
-static void copy_llf(void* e1, const void* e2) { *(long double*) e1 = *(long double*) e2; }
 static void copy_z  (void* e1, const void* e2) { *(size_t*) e1 = *(size_t*) e2; }
 static void copy_str(void* e1, const void* e2) { *(char**)e1 = strdup(*(char**)e2); }
 static void copy_ptr(void* e1, const void* e2) { *(void**)e1 = *(void**)e2; }
@@ -268,7 +255,6 @@ static void copy_ptr(void* e1, const void* e2) { *(void**)e1 = *(void**)e2; }
 #define move_u64 copy_u64
 #define move_f   copy_f  
 #define move_lf  copy_lf 
-#define move_llf copy_llf
 #define move_z   copy_z  
 static void move_str(void* e1, const void* e2) { *(char**)e1 = strdup(*(char**)e2); *(char**)e2 = NULL; }
 static void move_ptr(void* e1, const void* e2) { *(void**)e1 = *(void**)e2; *(char**)e2 = NULL; }
@@ -277,15 +263,15 @@ static void move_ptr(void* e1, const void* e2) { *(void**)e1 = *(void**)e2; *(ch
 
 #define DECLARE_TRAIT_STRUCT(_t) \
 	static const ax_stuff_trait trait_##_t = { \
-		.type = type_##_t, \
-		.size = size_##_t, \
+		.type  = type_##_t,  \
+		.size  = size_##_t,  \
 		.equal = equal_##_t, \
-		.less = less_##_t, \
-		.hash = hash_##_t, \
-		.free = free_##_t, \
-		.copy = copy_##_t, \
-		.move = move_##_t, \
-		.text = text_##_t \
+		.less  = less_##_t,  \
+		.hash  = hash_##_t,  \
+		.free  = free_##_t,  \
+		.copy  = copy_##_t,  \
+		.move  = move_##_t,  \
+		.text  = text_##_t   \
 	};
 
 DECLARE_TRAIT_STRUCT(nil)
@@ -299,7 +285,6 @@ DECLARE_TRAIT_STRUCT(u32)
 DECLARE_TRAIT_STRUCT(u64)
 DECLARE_TRAIT_STRUCT(f  )
 DECLARE_TRAIT_STRUCT(lf )
-DECLARE_TRAIT_STRUCT(llf)
 DECLARE_TRAIT_STRUCT(z  )
 DECLARE_TRAIT_STRUCT(str)
 DECLARE_TRAIT_STRUCT(ptr)
@@ -317,10 +302,9 @@ const ax_stuff_trait* ax_stuff_traits(ax_stuff_type type)
 		case AX_ST_U16:  return &trait_u16;
 		case AX_ST_U32:  return &trait_u32;
 		case AX_ST_U64:  return &trait_u64;
-		case AX_ST_Z:    return &trait_f;
-		case AX_ST_F:    return &trait_lf;
-		case AX_ST_LF:   return &trait_llf;
-		case AX_ST_LLF:  return &trait_z;
+		case AX_ST_Z:    return &trait_z;
+		case AX_ST_F:    return &trait_f;
+		case AX_ST_LF:   return &trait_lf;
 		case AX_ST_STR:  return &trait_str;
 		case AX_ST_PTR:  return &trait_ptr;
 		case AX_ST_RAW:  return NULL;

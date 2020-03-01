@@ -95,14 +95,6 @@ ax_vaf* ax_vaf_make(char *fmt)
 				switch (fmt[pos]) {
 					case 'f':
 						TYPE_ACCEPT(AX_ST_LF);
-					case 'l':
-						pos++;
-						switch (fmt[pos]) {
-							case 'f':
-								TYPE_ACCEPT(AX_ST_LLF);
-							default:
-								goto bad_char;
-						}
 						break;
 					default:
 						goto bad_char;
@@ -252,7 +244,6 @@ ax_vail* ax_vail_make(ax_vaf* vaf, ...)
 				case AX_ST_Z:   node->value.z   = (float)va_arg(va, size_t); break;
 				case AX_ST_F:   node->value.f   = (float)va_arg(va, double); break;
 				case AX_ST_LF:  node->value.lf  = va_arg(va, double); break;
-				case AX_ST_LLF: node->value.llf = va_arg(va, long double); break;
 				case AX_ST_PTR: node->value.ptr = va_arg(va, void*);
 								break;
 				case AX_ST_STR: node->value.str = va_arg(va, char*);
@@ -281,7 +272,7 @@ void ax_vail_free(ax_vail* vail) {
 
 #include <stdio.h>
 void test() {
-	ax_vaf* vaf = ax_vaf_make("llf_i8_&i8.sx3_i32");
+	ax_vaf* vaf = ax_vaf_make("lf_i8_&i8.sx3_i32");
 	printf("argc = %hhd\n", vaf->argc);
 	for(int i = 0; i< vaf->argc; i++) {
 		printf("%s %hhd\n", ax_stuff_name(vaf->table[i].type), vaf->table[i].mut);

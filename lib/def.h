@@ -26,8 +26,6 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-typedef long double longd_t;
-
 struct ax_string_table_st {
 	char* unknow;
 	char* uncompatable_type;

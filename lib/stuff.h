@@ -40,10 +40,9 @@ typedef uint8_t ax_stuff_type;
 #define AX_ST_Z     10
 #define AX_ST_F     11
 #define AX_ST_LF    12
-#define AX_ST_LLF   13
-#define AX_ST_STR   14
-#define AX_ST_PTR   15
-#define AX_ST_PWL   16
+#define AX_ST_STR   13
+#define AX_ST_PTR   14
+#define AX_ST_PWL   15
 
 union ax_stuff_u
 {
@@ -58,7 +57,6 @@ union ax_stuff_u
 	size_t   z;
 	float    f;
 	double   lf;
-	long double llf;
 	char*    str;
 	void*    ptr;
 	void*    raw;
