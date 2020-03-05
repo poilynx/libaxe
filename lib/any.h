@@ -35,20 +35,18 @@
 struct ax_any_st;
 typedef struct ax_any_st ax_any;
 
-typedef ax_any *ax_pany;
-typedef ax_any *ax_ptuple;
-typedef ax_any *ax_pbox;
-typedef ax_any *ax_pmap;
-typedef ax_any *ax_pseq;
-typedef ax_any *ax_pstr;
-
 struct ax_stuff_trait_st;
 typedef struct ax_stuff_trait_st ax_stuff_trait;
 
-typedef void   (*ax_free_f)  (      ax_pany this);
-typedef void   (*ax_dump_f)  (const ax_pany this, int ind);
-typedef ax_any*(*ax_copy_f)  (const ax_pany this);
-typedef ax_any*(*ax_move_f)  (      ax_pany this);
+typedef ax_any ax_abox;
+typedef ax_any ax_aseq;
+typedef ax_any ax_astr;
+typedef ax_any ax_amap;
+
+typedef void   (*ax_free_f)  (      ax_any* this);
+typedef void   (*ax_dump_f)  (const ax_any* this, int ind);
+typedef ax_any*(*ax_copy_f)  (const ax_any* this);
+typedef ax_any*(*ax_move_f)  (      ax_any* this);
 
 struct ax_any_trait_st
 {
@@ -73,15 +71,15 @@ struct ax_any_st
 	const ax_any_trait* tr;
 };
 
-bool ax_IS(ax_any* any, char type);
+bool ax_IS(const ax_any* any, char type);
 const char* ax_type_name(char type);
 ax_stuff_trait* ax_any_stuff_trait();
 
-static inline const char* ax_any_name (const ax_pany this) { return this->tr->name; }
-static inline char        ax_any_type (const ax_pany this) { return this->tr->type; }
-static inline void        ax_any_free (      ax_pany this) { return this->tr->free(this); }
-static inline ax_any*     ax_any_copy (const ax_pany this) { return this->tr->copy(this); }
-static inline ax_any*     ax_any_move (      ax_pany this) { return this->tr->move(this); }
+static inline const char* ax_any_name (const ax_any* this) { return this->tr->name; }
+static inline char        ax_any_type (const ax_any* this) { return this->tr->type; }
+static inline void        ax_any_free (      ax_any* this) { return this->tr->free(this); }
+static inline ax_any*     ax_any_copy (const ax_any* this) { return this->tr->copy(this); }
+static inline ax_any*     ax_any_move (      ax_any* this) { return this->tr->move(this); }
 
 #define ax_any_name(this) (ax_step(ax_any_name), ax_any_name(this))
 #define ax_any_type(this) (ax_step(ax_any_type), ax_any_type(this))

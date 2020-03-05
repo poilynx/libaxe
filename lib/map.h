@@ -33,11 +33,11 @@ typedef struct ax_stuff_trait_st ax_stuff_trait;
 struct ax_map_st;
 typedef struct ax_map_st ax_map;
 
-typedef int     (*ax_map_put_f)  (ax_pmap this, ax_pair pair);
-typedef ax_iter (*ax_map_get_f)  (ax_pmap this, ax_cref key);
-typedef bool    (*ax_map_exist_f)(ax_pmap this, ax_cref key);
-typedef ax_iter (*ax_map_find_f) (ax_pmap this, ax_cref value);
-typedef bool    (*ax_map_erase_f)(ax_pmap this, ax_cref key);
+typedef int     (*ax_map_put_f)  (ax_amap* this, ax_pair pair);
+typedef ax_iter (*ax_map_get_f)  (ax_amap* this, ax_cref key);
+typedef bool    (*ax_map_exist_f)(ax_amap* this, ax_cref key);
+typedef ax_iter (*ax_map_find_f) (ax_amap* this, ax_cref value);
+typedef bool    (*ax_map_erase_f)(ax_amap* this, ax_cref key);
 
 typedef ax_cref (*ax_iter_pairkey_f)(ax_iter* it);
 typedef ax_ref  (*ax_iter_pairval_f)(ax_iter* it);
@@ -65,11 +65,11 @@ struct ax_map_st
 	const ax_stuff_trait* elem_tr;
 };
 
-int ax_map_put      (ax_pmap this, ax_pair pair)  { return ((ax_map*)this)->tr.put(this, pair); }
-ax_iter ax_map_get  (ax_pmap this, ax_cref key)   { return ((ax_map*)this)->tr.get(this, key); }
-ax_iter ax_map_find (ax_pmap this, ax_cref value) { return ((ax_map*)this)->tr.find(this, value); }
-bool ax_map_exist   (ax_pmap this, ax_cref key)   { return ((ax_map*)this)->tr.exist(this, key); }
-bool ax_map_erase   (ax_pmap this, ax_cref key)   { return ((ax_map*)this)->tr.erase(this, key); }
+int     ax_map_put   (ax_amap* this, ax_pair pair)  { return ((ax_map*)this)->tr.put(this, pair); }
+ax_iter ax_map_get   (ax_amap* this, ax_cref key)   { return ((ax_map*)this)->tr.get(this, key); }
+ax_iter ax_map_find  (ax_amap* this, ax_cref value) { return ((ax_map*)this)->tr.find(this, value); }
+bool    ax_map_exist (ax_amap* this, ax_cref key)   { return ((ax_map*)this)->tr.exist(this, key); }
+bool    ax_map_erase (ax_amap* this, ax_cref key)   { return ((ax_map*)this)->tr.erase(this, key); }
 ax_cref ax_iter_pair_key(ax_iter* it) { /*check type*/ return ((ax_map*)it->owner)->tr.itkey(it); }
 ax_ref  ax_iter_pair_val(ax_iter* it) { /*check type*/ return ((ax_map*)it->owner)->tr.itval(it); }
 
