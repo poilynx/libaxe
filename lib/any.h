@@ -45,10 +45,10 @@ typedef ax_any *ax_pstr;
 struct ax_stuff_trait_st;
 typedef struct ax_stuff_trait_st ax_stuff_trait;
 
-typedef void (*ax_free_f)  (ax_any* any);
-typedef void (*ax_dump_f)  (const ax_any* any, int ind);
-typedef ax_any*(*ax_copy_f)  (const ax_any* any);
-typedef ax_any*(*ax_move_f)  (ax_any* any);
+typedef void   (*ax_free_f)  (      ax_pany this);
+typedef void   (*ax_dump_f)  (const ax_pany this, int ind);
+typedef ax_any*(*ax_copy_f)  (const ax_pany this);
+typedef ax_any*(*ax_move_f)  (      ax_pany this);
 
 struct ax_any_trait_st
 {
@@ -73,22 +73,21 @@ struct ax_any_st
 	const ax_any_trait* tr;
 };
 
-bool ax_IS(const ax_any* any, char type);
+bool ax_IS(ax_any* any, char type);
 const char* ax_type_name(char type);
 ax_stuff_trait* ax_any_stuff_trait();
 
-static inline void        ax_any_free (ax_any *a)       { a->tr->free(a); }
-static inline char        ax_any_type (ax_any *a)       { return a->tr->type; }
-static inline ax_any*     ax_any_move (ax_any *a)       { return a->tr->move(a); }
-static inline ax_any*     ax_any_copy (ax_any *a)       { return a->tr->copy(a); }
-static inline const char* ax_any_name (const ax_any *a) { return a->tr->name; }
+static inline const char* ax_any_name (const ax_pany this) { return this->tr->name; }
+static inline char        ax_any_type (const ax_pany this) { return this->tr->type; }
+static inline void        ax_any_free (      ax_pany this) { return this->tr->free(this); }
+static inline ax_any*     ax_any_copy (const ax_pany this) { return this->tr->copy(this); }
+static inline ax_any*     ax_any_move (      ax_pany this) { return this->tr->move(this); }
 
-#define ax_any_free(_a) (ax_step(ax_any_free), ax_any_free(_a))
-#define ax_any_type(_a) (ax_step(ax_any_type), ax_any_type(_a))
-#define ax_any_move(_a) (ax_step(ax_any_move), ax_any_move(_a))
-#define ax_any_copy(_a) (ax_step(ax_any_copy), ax_any_copy(_a))
-#define ax_any_name(_a) (ax_step(ax_any_name), ax_any_name(_a))
-
+#define ax_any_name(this) (ax_step(ax_any_name), ax_any_name(this))
+#define ax_any_type(this) (ax_step(ax_any_type), ax_any_type(this))
+#define ax_any_free(this) (ax_step(ax_any_free), ax_any_free(this))
+#define ax_any_copy(this) (ax_step(ax_any_copy), ax_any_copy(this))
+#define ax_any_move(this) (ax_step(ax_any_move), ax_any_move(this))
 
 #ifdef AX_DEBUG
 inline static void ax_any_set_magic(const ax_any* any)
@@ -117,7 +116,7 @@ inline static bool ax_any_check_magic(const ax_any* any)
 inline static void ax_any_assert_type(const ax_any* any, char type)
 {
 	ax_panic_if(!ax_any_check_magic(any), AX_LM_ERROR, "Invalid !any pointer");
-	ax_panic_if(!ax_IS(any, type), AX_LM_ERROR, "Not a %s, but %s", ax_type_name(type), ax_any_name(any));
+	ax_panic_if(!ax_IS((ax_any*)any, type), AX_LM_ERROR, "Not a %s, but %s", ax_type_name(type), ax_any_name((ax_any*)any));
 }
 #endif
 

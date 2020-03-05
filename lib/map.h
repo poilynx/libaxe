@@ -33,11 +33,11 @@ typedef struct ax_stuff_trait_st ax_stuff_trait;
 struct ax_map_st;
 typedef struct ax_map_st ax_map;
 
-typedef int      (*ax_map_put_f)(ax_any* any, ax_cref key, ax_cref value);
-typedef ax_iter(*ax_map_get_f)(ax_any* any, ax_cref key);
-typedef bool(*ax_map_exist_f)(ax_any* any, ax_cref key);
-typedef ax_iter(*ax_map_find_f)(ax_any* any, ax_cref value);
-typedef bool(*ax_map_erase_f)(ax_any* any, ax_cref key);
+typedef int     (*ax_map_put_f)  (ax_pmap this, ax_pair pair);
+typedef ax_iter (*ax_map_get_f)  (ax_pmap this, ax_cref key);
+typedef bool    (*ax_map_exist_f)(ax_pmap this, ax_cref key);
+typedef ax_iter (*ax_map_find_f) (ax_pmap this, ax_cref value);
+typedef bool    (*ax_map_erase_f)(ax_pmap this, ax_cref key);
 
 typedef ax_cref (*ax_iter_pairkey_f)(ax_iter* it);
 typedef ax_ref  (*ax_iter_pairval_f)(ax_iter* it);
@@ -58,24 +58,27 @@ struct ax_map_st
 {
 	ax_box box;
 	const ax_pair pair;
+#ifdef AX_DEBUG
+	bool d_pair_used;
+#endif
 	const ax_map_trait tr;
 	const ax_stuff_trait* elem_tr;
 };
 
-int       ax_map_put  (ax_any* any, ax_ref key, ax_ref value);
-ax_iter ax_map_get  (ax_any* any, ax_ref key);
-ax_iter ax_map_find (ax_any* any, ax_ref value);
-bool ax_map_exist(ax_any* any, ax_ref key);
-bool ax_map_erase(ax_any* any);
-ax_cref ax_iter_pair_key(ax_iter* it);
-ax_ref  ax_iter_pair_val(ax_iter* it);
+int ax_map_put      (ax_pmap this, ax_pair pair)  { return ((ax_map*)this)->tr.put(this, pair); }
+ax_iter ax_map_get  (ax_pmap this, ax_cref key)   { return ((ax_map*)this)->tr.get(this, key); }
+ax_iter ax_map_find (ax_pmap this, ax_cref value) { return ((ax_map*)this)->tr.find(this, value); }
+bool ax_map_exist   (ax_pmap this, ax_cref key)   { return ((ax_map*)this)->tr.exist(this, key); }
+bool ax_map_erase   (ax_pmap this, ax_cref key)   { return ((ax_map*)this)->tr.erase(this, key); }
+ax_cref ax_iter_pair_key(ax_iter* it) { /*check type*/ return ((ax_map*)it->owner)->tr.itkey(it); }
+ax_ref  ax_iter_pair_val(ax_iter* it) { /*check type*/ return ((ax_map*)it->owner)->tr.itval(it); }
 
-#define ax_map_put  (_a, _k, _v) (ax_step(ax_map_put  ), ax_map_put  (_a, _k, _v))
-#define ax_map_get  (_a, _k)     (ax_step(ax_map_get  ), ax_map_get  (_a, _k))
-#define ax_map_find (_a, _v)     (ax_step(ax_map_find ), ax_map_find (_a, _v))   
-#define ax_map_exist(_a, _k)     (ax_step(ax_map_exist), ax_map_exist(_a, _k))  
-#define ax_map_erase(_a)         (ax_step(ax_map_erase), ax_map_erase(_a))
-#define ax_iter_pair_key(_it)    (ax_step(ax_iter_pair_key), ax_iter_pair_key(_it))
-#define ax_iter_pair_val(_it)    (ax_step(ax_iter_pair_val), ax_iter_pair_val(_it))
+#define ax_map_put  (this, _k, _v) (ax_step(ax_map_put  ),     ax_map_put  (this, _k, _v))
+#define ax_map_get  (this, _k)     (ax_step(ax_map_get  ),     ax_map_get  (this, _k))
+#define ax_map_find (this, _v)     (ax_step(ax_map_find ),     ax_map_find (this, _v))   
+#define ax_map_exist(this, _k)     (ax_step(ax_map_exist),     ax_map_exist(this, _k))  
+#define ax_map_erase(this)         (ax_step(ax_map_erase),     ax_map_erase(this))
+#define ax_iter_pair_key(_it)      (ax_step(ax_iter_pair_key), ax_iter_pair_key(_it))
+#define ax_iter_pair_val(_it)      (ax_step(ax_iter_pair_val), ax_iter_pair_val(_it))
 
 #endif

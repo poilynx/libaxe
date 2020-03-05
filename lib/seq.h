@@ -29,22 +29,25 @@ struct ax_stuff_trait_st;
 typedef struct ax_stuff_trait_st ax_stuff_trait;
 struct ax_seq_st;
 typedef struct ax_seq_st ax_seq;
+struct ax_seq_trait_st;
+typedef struct ax_seq_trait_st ax_seq_trait;
 
-typedef bool    (*ax_seq_push_f)   (ax_any* any, ax_cref elem);
-typedef ax_iter (*ax_seq_find_f)   (ax_any* any, ax_cref elem);
-typedef bool    (*ax_seq_pop_f)    (ax_any* any);
-typedef void    (*ax_seq_sort_f)   (ax_any* any);
-typedef void    (*ax_seq_invert_f) (ax_any* any);
+typedef ax_pseq (*ax_seq_alloc_f)  (ax_seq_trait* seq_tr, ax_stuff_trait* elem_tr);
+typedef bool    (*ax_seq_push_f)   (ax_pseq this, ax_cref elem);
+typedef ax_iter (*ax_seq_find_f)   (ax_pseq this, ax_cref elem);
+typedef bool    (*ax_seq_pop_f)    (ax_pseq this);
+typedef void    (*ax_seq_sort_f)   (ax_pseq this);
+typedef void    (*ax_seq_invert_f) (ax_pseq this);
 
 struct ax_seq_trait_st
 {
+	ax_seq_alloc_f alloc;
 	ax_seq_push_f push;
 	ax_seq_pop_f  pop;
 	ax_seq_sort_f sort;
 	ax_seq_find_f find;
 	ax_seq_invert_f invert;
 };
-typedef struct ax_seq_trait_st ax_seq_trait;
 
 struct ax_seq_st
 {
@@ -53,16 +56,18 @@ struct ax_seq_st
 	const ax_stuff_trait* elem_tr;
 };
 
-inline static bool    ax_seq_push   (ax_any* any, ax_cref elem) { return ((ax_seq*)any)->tr->push(any, elem); }
-inline static ax_iter ax_seq_find   (ax_any* any, ax_cref elem) { return ((ax_seq*)any)->tr->find(any, elem); }
-inline static bool    ax_seq_pop    (ax_any* any)               { return ((ax_seq*)any)->tr->pop(any); }
-inline static void    ax_seq_sort   (ax_any* any)               { ((ax_seq*)any)->tr->sort(any); }
-inline static void    ax_seq_invert (ax_any* any)               { ((ax_seq*)any)->tr->invert(any); }
+inline static ax_pseq ax_seq_alloc  (ax_seq_trait* seq_tr, ax_stuff_trait* elem_tr) { return seq_tr->alloc(seq_tr, elem_tr);}
 
-#define ax_seq_push(_a, _e) (ax_step(ax_seq_push), ax_seq_push((_a), (_e)))
-#define ax_seq_pop(_a)      (ax_step(ax_seq_pop), ax_seq_pop((_a)))
-#define ax_seq_sort(_a)     (ax_step(ax_seq_sort), ax_seq_sort((_a)))
-#define ax_seq_find(_a)     (ax_step(ax_seq_find), ax_seq_find((_a)))
-#define ax_seq_invert(_a)   (ax_step(ax_seq_sort), ax_seq_invert((_a)))
+inline static bool    ax_seq_push   (ax_pseq this, ax_cref elem) { return ((ax_seq*)this)->tr->push(this, elem); }
+inline static ax_iter ax_seq_find   (ax_pseq this, ax_cref elem) { return ((ax_seq*)this)->tr->find(this, elem); }
+inline static bool    ax_seq_pop    (ax_pseq this)               { return ((ax_seq*)this)->tr->pop(this); }
+inline static void    ax_seq_sort   (ax_pseq this)               { return ((ax_seq*)this)->tr->sort(this); }
+inline static void    ax_seq_invert (ax_pseq this)               { return ((ax_seq*)this)->tr->invert(this); }
+
+#define ax_seq_push(this, _e) (ax_step(ax_seq_push), ax_seq_push((this), (_e)))
+#define ax_seq_pop(this)      (ax_step(ax_seq_pop),  ax_seq_pop((this)))
+#define ax_seq_sort(this)     (ax_step(ax_seq_sort), ax_seq_sort((this)))
+#define ax_seq_find(this)     (ax_step(ax_seq_find), ax_seq_find((this)))
+#define ax_seq_invert(this)   (ax_step(ax_seq_sort), ax_seq_invert((this)))
 
 #endif
