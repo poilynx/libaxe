@@ -46,7 +46,7 @@ typedef struct ax_iter_trait_st ax_iter_trait;
 
 struct ax_iter_st
 {
-	void* owner;
+	const void* owner;
 	void* point;
 	const ax_iter_trait* tr;
 };

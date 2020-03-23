@@ -27,13 +27,13 @@
 struct ax_str_st;
 typedef struct ax_str_st ax_str;
 
-typedef bool    (*ax_str_append_f) (ax_pstr this, ax_cref str);
-typedef size_t  (*ax_str_length_f) (ax_pstr this);
-typedef bool    (*ax_str_insert_f) (ax_pstr this, int start, ax_cref str);
-typedef ax_cref (*ax_str_cstr_f)   (ax_pstr this);
-typedef bool    (*ax_str_comp_f)   (ax_pstr this, const ax_pstr str);
-typedef ax_pstr (*ax_str_substr_f) (ax_pstr this, int start, size_t len);
-typedef ax_pseq (*ax_str_split_f)  (ax_pstr this, ax_cref ch);
+typedef bool     (*ax_str_append_f) (ax_astr* this, ax_cref str);
+typedef size_t   (*ax_str_length_f) (ax_astr* this);
+typedef bool     (*ax_str_insert_f) (ax_astr* this, int start, ax_cref str);
+typedef ax_cref  (*ax_str_cstr_f)   (ax_astr* this);
+typedef bool     (*ax_str_comp_f)   (ax_astr* this, const ax_astr* str);
+typedef ax_astr* (*ax_str_substr_f) (ax_astr* this, int start, size_t len);
+typedef ax_aseq* (*ax_str_split_f)  (ax_astr* this, ax_cref ch);
 
 struct ax_str_trait_st
 {

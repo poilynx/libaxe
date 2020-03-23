@@ -34,7 +34,7 @@ typedef struct ax_seq_trait_st ax_seq_trait;
 
 typedef ax_aseq* (*ax_seq_alloc_f)  (ax_seq_trait* seq_tr, ax_stuff_trait* elem_tr);
 typedef bool     (*ax_seq_push_f)   (ax_aseq* this, ax_cref elem);
-typedef ax_iter  (*ax_seq_find_f)   (ax_aseq* this, ax_cref elem);
+typedef ax_iter  (*ax_seq_find_f)   (const ax_aseq* this, ax_cref elem);
 typedef bool     (*ax_seq_pop_f)    (ax_aseq* this);
 typedef void     (*ax_seq_sort_f)   (ax_aseq* this);
 typedef void     (*ax_seq_invert_f) (ax_aseq* this);
@@ -56,13 +56,23 @@ struct ax_seq_st
 	const ax_stuff_trait* elem_tr;
 };
 
+typedef ax_seq*(*ax_seq_build_f)();
+struct ax_seq_builder_st
+{
+	ax_seq_build_f build;
+	const ax_seq_trait* tr;
+};
+typedef struct ax_seq_builder_st ax_seq_builder;
+typedef ax_seq_builder*(*ax_seq_builder_f)(void *base);
+//TODO
+
 inline static ax_aseq* ax_seq_alloc  (ax_seq_trait* seq_tr, ax_stuff_trait* elem_tr) { return seq_tr->alloc(seq_tr, elem_tr);}
 
 inline static bool     ax_seq_push   (ax_aseq* this, ax_cref elem) { return ((ax_seq*)this)->tr->push(this, elem); }
-inline static ax_iter  ax_seq_find   (ax_aseq* this, ax_cref elem) { return ((ax_seq*)this)->tr->find(this, elem); }
 inline static bool     ax_seq_pop    (ax_aseq* this)               { return ((ax_seq*)this)->tr->pop(this); }
 inline static void     ax_seq_sort   (ax_aseq* this)               { return ((ax_seq*)this)->tr->sort(this); }
 inline static void     ax_seq_invert (ax_aseq* this)               { return ((ax_seq*)this)->tr->invert(this); }
+inline static ax_iter  ax_seq_find   (const ax_aseq* this, ax_cref elem) { return ((ax_seq*)this)->tr->find(this, elem); }
 
 #define ax_seq_push(this, _e) (ax_step(ax_seq_push), ax_seq_push((this), (_e)))
 #define ax_seq_pop(this)      (ax_step(ax_seq_pop),  ax_seq_pop((this)))

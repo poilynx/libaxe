@@ -28,25 +28,25 @@
 #include <stdlib.h>
 #include <stdio.h>
 #ifdef AX_DEBUG
-#define BEGIN_TRAIT(_a) ax_any_assert_type((_a), AX_T_SEQ); ax_vector* vec = (ax_vector*)any;
+#define BEGIN_TRAIT(_a) ax_any_assert_type((_a), AX_T_SEQ); ax_vector* vec = (ax_vector*)_a;
 #else
-#define BEGIN_TRAIT(_a) ax_vector* vec = (ax_vector*)any;
+#define BEGIN_TRAIT(_a) ax_vector* vec = (ax_vector*)_a;
 
 #endif
 
-static void    box_clear(ax_any* any);
-static bool    seq_push(ax_any* any, ax_cref elem);
-static bool    seq_pop(ax_any* any);
-static ax_iter seq_find(ax_any* any, ax_cref elem);
-static void    seq_sort(ax_any* any);
+static bool    seq_push(ax_aseq* any, ax_cref elem);
+static bool    seq_pop(ax_aseq* any);
+static ax_iter seq_find(const ax_aseq* any, ax_cref elem);
+static void    seq_sort(ax_aseq* any);
 
-static size_t  box_size(ax_any* any);
-static size_t  box_maxsize(ax_any* any);
-static ax_iter box_begin(ax_any* any);
-static ax_iter box_end(ax_any* any);
-static ax_iter box_rbegin(ax_any* any);
-static ax_iter box_rend(ax_any* any);
-static ax_iter box_erase(ax_any* any, ax_iter* it);
+static void    box_clear(ax_any* any);
+static size_t  box_size(const ax_abox* any);
+static size_t  box_maxsize(const ax_abox* any);
+static ax_iter box_begin(const ax_abox* any);
+static ax_iter box_end(const ax_abox* abox);
+static ax_iter box_rbegin(const ax_abox* abox);
+static ax_iter box_rend(const ax_abox* abox);
+static ax_iter box_erase(ax_abox* abox, ax_iter* it);
 
 static void    any_free(ax_any* any);
 static void    any_dump(const ax_any* any, int ind);
@@ -67,14 +67,14 @@ static inline void check_two_iterator(const ax_iter* it1, const ax_iter* it2)
 
 static void iter_shift(ax_iter* it, int i)
 {
-	ax_vector* vec = it->owner;
+	const ax_vector* vec = it->owner;
 	long off = (i * (vec->elem_size));
 	it->point += it->tr->norm ? + off : - off;
 }
 
 static ax_ref iter_get(const ax_iter* it, int i)
 {
-	ax_vector* vec = it->owner;
+	const ax_vector* vec = it->owner;
 	ax_ref ref;
 	ref.d_type = vec->seq.elem_tr->type;
 	ref.ptr = it->point;
@@ -97,7 +97,7 @@ static bool iter_less(const ax_iter* it1, const ax_iter* it2)
 static size_t iter_dist(const ax_iter* it1, const ax_iter* it2)
 {
 	check_two_iterator(it1, it2);
-	ax_vector* vec = it1->owner;
+	const ax_vector* vec = it1->owner;
 	size_t len = (it1->point > it2->point)
 		? it1->point - it2->point
 		: it2->point - it1->point;
@@ -165,18 +165,18 @@ static ax_any* any_move(ax_any* any)
 
 }
 
-static size_t box_size(ax_any* any)
+static size_t box_size(const ax_abox* any)
 {
 	BEGIN_TRAIT(any);
 	return vec->size;
 }
 
-static size_t box_maxsize(ax_any* any)
+static size_t box_maxsize(const ax_abox* any)
 {
 	return 1028;
 }
 
-static ax_iter box_begin(ax_any* any)
+static ax_iter box_begin(const ax_abox* any)
 {
 	BEGIN_TRAIT(any);
 	ax_iter it;
@@ -186,7 +186,7 @@ static ax_iter box_begin(ax_any* any)
 	return it;
 }
 
-static ax_iter box_end(ax_any* any)
+static ax_iter box_end(const ax_abox* any)
 {
 	BEGIN_TRAIT(any);
 	ax_iter it;
@@ -197,7 +197,7 @@ static ax_iter box_end(ax_any* any)
 	
 }
 
-static ax_iter box_rbegin(ax_any* any)
+static ax_iter box_rbegin(const ax_abox* any)
 {
 	BEGIN_TRAIT(any);
 	ax_iter it;
@@ -207,7 +207,7 @@ static ax_iter box_rbegin(ax_any* any)
 	return it;
 }
 
-static ax_iter box_rend(ax_any* any)
+static ax_iter box_rend(const ax_abox* any)
 {
 	BEGIN_TRAIT(any);
 	ax_iter it;
@@ -301,11 +301,11 @@ static void seq_invert(ax_any* any)
 		left++, right--;
 	}
 }
-static ax_iter seq_find(ax_any* any, ax_cref elem)
+static ax_iter seq_find(const ax_aseq* this, ax_cref elem)
 {
-	BEGIN_TRAIT(any);
+	BEGIN_TRAIT(this);
 	ax_cref_check(elem, vec->seq.elem_tr->type);
-	ax_iter it = { .owner = any, .tr = &iter_trait };
+	ax_iter it = { .owner = vec, .tr = &iter_trait };
 	void* end = vec->buffer + (vec->size - 1) * vec->elem_size;
 	for (void* p = vec->buffer; p < end; p += vec->elem_size) {
 		if(vec->seq.elem_tr->equal(elem.ptr, p)) {
